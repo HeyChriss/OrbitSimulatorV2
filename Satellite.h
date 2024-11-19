@@ -53,6 +53,14 @@ public:
     const Angle& getAngle() const { return angle; }
     const Position& getPosition() const { return pos; }
 
+
+    virtual int getAge() const { return age; }
+    //virtual double getRadius() const { return radius; }
+    // virtual const Position& getPosition() const { return pos; }
+    // virtual const Angle& getAngle() const { return angle; }
+    // virtual bool isDead() const { return dead; }
+    // virtual bool isInvisible() const { return age < 10; }
+
     // Setters
     virtual void kill() { if (!isInvisible()) dead = true; }
 

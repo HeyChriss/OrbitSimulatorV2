@@ -3,6 +3,8 @@
 #include "velocity.h"
 #include "uiDraw.h"
 
+class TestSputnik;
+
 /*********************************************
  * SPUTNIK
  * The first artificial satellite in space
@@ -10,16 +12,28 @@
 class Sputnik : public Satellite
 {
 public:
-    Sputnik() : Satellite(0, 4.0, 0.1)  // age=0, radius=4.0, angularVelocity=0.1
+    friend TestSputnik;
+    Sputnik() : Satellite(0, 4.0, 0.001)  // age=0, radius=4.0, angularVelocity=0.1
     {
-        // Initial position at 42164000 meters (like in the prototype)
-        pos.setMetersX(0.0);
-        pos.setMetersY(42164000.0);  // Geostationary orbit altitude
+        // Initial position and velocity for retrograde orbit
+        pos.setMetersX(-36515095.13);
+        pos.setMetersY(21082000.0);
 
-        // Initial velocity for circular orbit (like in the prototype)
-        velocity.setDX(3100.0);  // m/s
-        velocity.setDY(0.0);      // m/s
+        velocity.setDX(2050.0);  // m/s
+        velocity.setDY(2684.68); // m/s
+
+        timeDilation = 48.0; // Slowed down from 1440 for better visualization
     }
+
+    virtual void move(double time) override
+    {
+        // Scale time by dilation factor for orbital motion
+        Satellite::move(time * timeDilation);
+
+        // Reset angle change to remove time dilation effect on rotation
+        angle.add(-angularVelocity * (timeDilation - 1.0));  // Counteract the extra rotation
+    }
+
 
     // Draw the Sputnik satellite
     virtual void draw(ogstream& gout) override
@@ -28,56 +42,29 @@ public:
             gout.drawSputnik(pos, angle.getRadians());
     }
 
-
-};
-
-
-#pragma once
-#include "satellite.h"
-#include "velocity.h"
-#include "uiDraw.h"
-
-/*********************************************
- * SPUTNIK
- * The first artificial satellite in space
- *********************************************/
-class Sputnik : public Satellite
-{
-public:
-    Sputnik() : Satellite(0, 4.0, 0.1)  // age=0, radius=4.0, angularVelocity=0.1
-    {
-        // Constants
-        const double EARTH_RADIUS = 6378000.0;  // meters
-        const double GEO_POSITION = 42164000.0; // meters, like in prototype
-
-        // Initial position - Start at GEO altitude
-        pos.setMeters(0.0, GEO_POSITION);  // Place at the equator like prototype
-
-        // Initial velocity for GEO - matching prototype values
-        velocity.setDX(-3100.0);  // m/s just like prototype
-        velocity.setDY(0.0);      // m/s
-
-        // Time settings (for move() if needed)
-        const double HOURS_PER_DAY = 24.0;
-        const double MINUTES_PER_HOUR = 60.0;
-        timeDilation = HOURS_PER_DAY * MINUTES_PER_HOUR;  // 1440
-        timePerFrame = timeDilation / 30.0;  // 30 is the frameRate
-    }
-
-    virtual void draw(ogstream& gout) override
+    // Draw the Sputnik satellite
+    virtual void destroy(std::list<Satellite*>& satellites) override
     {
         if (!isInvisible() && !isDead())
         {
-            // Calculate angle for satellite display like in prototype
-            double angleShip = atan2(velocity.getDY(), velocity.getDX());
-            gout.drawSputnik(pos, angleShip);
+            // Create 4 fragments
+            for (int i = 0; i < 4; i++)
+            {
+                Angle fragmentAngle;
+                fragmentAngle.setDegrees(random(0.0, 360.0));
+                satellites.push_back(new Satellite(*this, fragmentAngle));
+            }
+            kill();
         }
     }
 
+
 private:
-    double timeDilation;
-    double timePerFrame;
+    double timeDilation;  // Time scaling factor for this satellite
 };
+
+
+
 
 
 

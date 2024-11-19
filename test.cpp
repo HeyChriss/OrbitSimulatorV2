@@ -4,10 +4,11 @@
 #include "testAcceleration.h"
 #include "testAngle.h"
 #include "testSatellite.h"
-//#include "testDirection.h"
-//#include "TestSimulationObject.h"
-//#include "TestSatellite.h"
-//#include "TestSputnik.h"
+#include "testSputnik.h"
+#include "testHubble.h"
+#include "TestStarlink.h"
+#include "TestCrewDragon.h"
+#include "TestGPS.h"
 
 /*****************************************************************
  * TEST RUNNER
@@ -20,9 +21,11 @@ void testRunner()
 	TestAcceleration().run();
 	TestAngle().run();
 	TestSatellite().run();
-	//TestDirection().run();
-	//TestSimulationObject().run();
-	//TestSatellite().run();
+	TestSputnik().run();
+	TestHubble().run();
+	TestStarlink().run();
+	TestCrewDragon().run();
+	TestGPS().run();
 	//TestSputnik().run();
 
 

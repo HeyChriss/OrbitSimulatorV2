@@ -18,6 +18,11 @@ class TestPosition;
 class TestVelocity;
 class TestAcceleration;
 class TestSatellite;
+class TestSputnik;
+class TestHubble;
+class TestStarlink;
+class TestCrewDragon;
+class TestGPS;
 
  /************************************
   * ANGLE
@@ -30,6 +35,11 @@ public:
    friend TestVelocity;
    friend TestAngle;
    friend TestSatellite;
+   friend TestSputnik;
+   friend TestHubble;
+   friend TestStarlink;
+   friend TestCrewDragon;
+   friend TestGPS;
 
    // Constructors
    Angle()                  : radians(0.0)         {}

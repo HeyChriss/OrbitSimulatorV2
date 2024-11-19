@@ -11,6 +11,10 @@
 #include "position.h"
 #include "sputnik.h"
 #include "test.h"
+#include "hubble.h"
+#include "starlink.h"
+#include "crewDragon.h"
+#include "GPS.h"
 using namespace std;
 
 /*********************************************
@@ -23,7 +27,11 @@ public:
     // Constructor initializes the simulation
     Simulator(Position ptUpperRight) :
         ptUpperRight(ptUpperRight),
-        pSputnik(new Sputnik())
+        pSputnik(new Sputnik()),
+        pHubble(new Hubble()),
+        pStarlink(new Starlink()),
+        pCrewDragon(new CrewDragon()),
+        pGPS(new GPS())
     {
         // Initialize the random stars
         for (int i = 0; i < NUM_STARS; i++)
@@ -40,6 +48,10 @@ public:
     ~Simulator()
     {
         delete pSputnik;
+        delete pHubble;
+        delete pStarlink;
+        delete pCrewDragon;
+        delete pGPS;
     }
 
     // Move everything forward one time unit
@@ -48,6 +60,21 @@ public:
         // Move Sputnik according to physics (includes orbital motion)
         if (pSputnik && !pSputnik->isDead())
             pSputnik->move(1.0);
+
+        // Move Hubble according to physics
+        if (pHubble && !pHubble->isDead())
+            pHubble->move(1.0);
+
+        // Move Starlink according to physics
+        if (pStarlink && !pStarlink->isDead())
+            pStarlink->move(1.0);
+
+        // Move CrewDragon according to physics
+        if (pCrewDragon && !pCrewDragon->isDead())
+            pCrewDragon->move(1.0);
+
+        if (pGPS && !pGPS->isDead())
+            pGPS->move(1.0);
 
         // Update star phases for twinkling
         for (int i = 0; i < NUM_STARS; i++)
@@ -68,11 +95,28 @@ public:
         // Draw Sputnik last (foreground)
         if (pSputnik && !pSputnik->isDead())
             pSputnik->draw(gout);
+
+        if (pHubble && !pHubble->isDead())
+            pHubble->draw(gout);
+
+        if (pStarlink && !pStarlink->isDead())
+            pStarlink->draw(gout);
+
+        if (pCrewDragon && !pCrewDragon->isDead())
+            pCrewDragon->draw(gout);
+
+        if (pGPS && !pGPS->isDead())
+            pGPS->draw(gout);
+
     }
 
 private:
     Position ptUpperRight;         // Size of the screen
     Sputnik* pSputnik;            // The Sputnik satellite
+    Hubble* pHubble;
+    CrewDragon* pCrewDragon;
+    Starlink* pStarlink;
+    GPS* pGPS;
     static const int NUM_STARS = 100;
     Position stars[NUM_STARS];     // Array of star positions
     uint8_t phases[NUM_STARS];     // Array of star phases
