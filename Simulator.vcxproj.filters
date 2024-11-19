@@ -48,6 +48,18 @@
     <ClCompile Include="Sputnik.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Hubble.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Starlink.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CrewDragon.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GPS.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -96,6 +108,33 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Sputnik.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TestSputnik.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Hubble.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TestHubble.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Starlink.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TestStarlink.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CrewDragon.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TestCrewDragon.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GPS.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TestGPS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

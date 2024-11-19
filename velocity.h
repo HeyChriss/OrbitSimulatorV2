@@ -15,6 +15,11 @@ class TestPosition;
 class TestVelocity;
 class TestAcceleration;
 class TestSatellite;
+class TestSputnik;
+class TestHubble;
+class TestStarlink;
+class TestCrewDragon;
+class TestGPS;
 
 // for add()
 class Acceleration;
@@ -30,6 +35,11 @@ class Velocity
    friend TestPosition;
    friend TestVelocity;
    friend TestSatellite;
+   friend TestSputnik;
+   friend TestHubble;
+   friend TestStarlink;
+   friend TestCrewDragon;
+   friend TestGPS;
 
    
 public:

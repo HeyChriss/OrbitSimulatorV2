@@ -33,6 +33,8 @@ private:
 
 protected:
 
+
+
     // for closeEnough() and assertEquals(), what is the tolerance?
     double tolerance = 0.0001;
 
@@ -117,4 +119,24 @@ protected:
             tests[sFunc];
         }
     }
+
+
+    /*************************************************************
+     * VERIFY
+     * Simple verification of condition
+     *************************************************************/
+    void verify(bool condition, const char* function)
+    {
+        std::string sFunc(function);
+        if (!condition)
+        {
+            Failure failure{ "Failed", __LINE__ };
+            tests[sFunc].push_back(failure);
+        }
+        else
+        {
+            tests[sFunc]; // Register successful test
+        }
+    }
+
 };

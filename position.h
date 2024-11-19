@@ -17,6 +17,11 @@ class TestPosition;
 class Acceleration;
 class Velocity;
 class TestSatellite;
+class TestSputnik;
+class TestHubble;
+class TestStarlink;
+class TestCrewDragon;
+class TestGPS;
 
 
 /*********************************************
@@ -28,6 +33,11 @@ class Position
 public:
    friend ::TestPosition;
    friend ::TestSatellite;
+   friend :: TestSputnik;
+   friend ::TestHubble;
+   friend ::TestStarlink;
+   friend ::TestCrewDragon;
+   friend ::TestGPS;
 
    
    // constructors

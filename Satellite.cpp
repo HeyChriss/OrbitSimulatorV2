@@ -17,10 +17,6 @@ const double TIME_DILATION = 1440.0;      // 24 hours * 60 minutes
 const double FRAME_RATE = 30.0;           // frames per second
 const double TIME_PER_FRAME = TIME_DILATION / FRAME_RATE;
 
-/*********************************************
- * SATELLITE : GET GRAVITY
- * Get the acceleration due to gravity at a given position
- *********************************************/
  /*********************************************
   * SATELLITE : GET GRAVITY
   * Get the acceleration due to gravity at a given position
