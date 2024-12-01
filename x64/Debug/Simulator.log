@@ -1,8 +1,4 @@
-﻿  Ship.cpp
-  Simulator.cpp
-  TestShip.cpp
-  test.cpp
+﻿  test.cpp
 C:\Users\USUARIO\Desktop\v2\testVelocity.h(16,1): warning C4005: 'M_PI_2': redefinición de macro
 C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\ucrt\corecrt_math_defines.h(29,1): message : vea la definición anterior de 'M_PI_2'
-  Generando código...
   Simulator.vcxproj -> C:\Users\USUARIO\Desktop\v2\x64\Debug\Simulator.exe
