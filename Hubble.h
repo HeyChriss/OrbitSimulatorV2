@@ -2,75 +2,132 @@
 #include "satellite.h"
 #include "velocity.h"
 #include "uiDraw.h"
+#include "part.h"
+#include "Fragment.h"
 
 class TestHubble;
 
-// Base component class for Hubble pieces
-class HubbleComponent : public Satellite {
+/*********************************************
+* HUBBLE TELESCOPE
+* Telescope component of a destroyed Hubble satellite
+*********************************************/
+class HubbleTelescope : public Part
+{
 public:
-    HubbleComponent(const Satellite& parent, double radius, int fragments) :
-        Satellite(0, radius, 0.0), numFragments(fragments)
-    {
-        pos = parent.getPosition();
-        velocity = Velocity();
-        timeDilation = 48.0;
+    HubbleTelescope(const Satellite& parent) : Part(10.0, 0.0, parent) {}
+
+    virtual void draw(ogstream& gout) override {
+        if (!isInvisible() && !isDead())
+            gout.drawHubbleTelescope(pos, angle.getRadians());
     }
 
-    virtual void destroy(std::list<Satellite*>& satellites) override {
-        if (!isInvisible() && !isDead()) {
-            for (int i = 0; i < numFragments; i++) {
+    virtual void destroy(std::list<Satellite*>& satellites) override
+    {
+        if (!isInvisible() && !isDead())
+        {
+            // Create 3 fragments
+            for (int i = 0; i < 3; i++)
+            {
                 Angle angle;
                 angle.setDegrees(random(0.0, 360.0));
-                satellites.push_back(new Satellite(*this, angle));
+                satellites.push_back(new Fragment(*this, angle));
+            }
+            kill();
+        }
+    }
+};
+
+/*********************************************
+* HUBBLE COMPUTER
+* Computer component of a destroyed Hubble satellite
+*********************************************/
+class HubbleComputer : public Part
+{
+public:
+    HubbleComputer(const Satellite& parent) : Part(7.0, 0.0, parent) {}
+
+    virtual void draw(ogstream& gout) override {
+        if (!isInvisible() && !isDead())
+            gout.drawHubbleComputer(pos, angle.getRadians());
+    }
+
+    virtual void destroy(std::list<Satellite*>& satellites) override
+    {
+        if (!isInvisible() && !isDead())
+        {
+            // Create 2 fragments
+            for (int i = 0; i < 2; i++)
+            {
+                Angle angle;
+                angle.setDegrees(random(0.0, 360.0));
+                satellites.push_back(new Fragment(*this, angle));
             }
             kill();
         }
     }
 
-    virtual void move(double time) override {
-        Satellite::move(time * timeDilation);
-        angle.add(-angularVelocity * (timeDilation - 1.0));
-    }
-
-protected:
-    int numFragments;
-    double timeDilation;
 };
 
-class HubbleTelescope : public HubbleComponent {
+/*********************************************
+* HUBBLE LEFT ARRAY
+* Left solar array of a destroyed Hubble satellite
+*********************************************/
+class HubbleLeftArray : public Part
+{
 public:
-    HubbleTelescope(const Satellite& parent) : HubbleComponent(parent, 10.0, 3) {}
-    virtual void draw(ogstream& gout) override {
-        if (!isInvisible() && !isDead())
-            gout.drawHubbleTelescope(pos, angle.getRadians());
-    }
-};
+    HubbleLeftArray(const Satellite& parent) : Part(8.0, 0.0, parent) {}
 
-class HubbleComputer : public HubbleComponent {
-public:
-    HubbleComputer(const Satellite& parent) : HubbleComponent(parent, 7.0, 2) {}
-    virtual void draw(ogstream& gout) override {
-        if (!isInvisible() && !isDead())
-            gout.drawHubbleComputer(pos, angle.getRadians());
-    }
-};
-
-class HubbleLeftArray : public HubbleComponent {
-public:
-    HubbleLeftArray(const Satellite& parent) : HubbleComponent(parent, 8.0, 2) {}
     virtual void draw(ogstream& gout) override {
         if (!isInvisible() && !isDead())
             gout.drawHubbleLeft(pos, angle.getRadians());
     }
+
+    virtual void destroy(std::list<Satellite*>& satellites) override
+    {
+        if (!isInvisible() && !isDead())
+        {
+            // Create 2 fragments
+            for (int i = 0; i < 2; i++)
+            {
+                Angle angle;
+                angle.setDegrees(random(0.0, 360.0));
+                satellites.push_back(new Fragment(*this, angle));
+            }
+            kill();
+        }
+    }
+
 };
 
-class HubbleRightArray : public HubbleComponent {
+/*********************************************
+* HUBBLE RIGHT ARRAY
+* Right solar array of a destroyed Hubble satellite
+*********************************************/
+class HubbleRightArray : public Part
+{
 public:
-    HubbleRightArray(const Satellite& parent) : HubbleComponent(parent, 8.0, 2) {}
+    HubbleRightArray(const Satellite& parent) : Part(8.0, 0.0, parent) {}
+
     virtual void draw(ogstream& gout) override {
         if (!isInvisible() && !isDead())
             gout.drawHubbleRight(pos, angle.getRadians());
     }
+
+    virtual void destroy(std::list<Satellite*>& satellites) override
+    {
+        if (!isInvisible() && !isDead())
+        {
+            // Create 2 fragments
+            for (int i = 0; i < 2; i++)
+            {
+                Angle angle;
+                angle.setDegrees(random(0.0, 360.0));
+                satellites.push_back(new Fragment(*this, angle));
+            }
+            kill();
+        }
+    }
+
 };
 
 class Hubble : public Satellite {
@@ -86,11 +143,21 @@ public:
     }
 
     virtual void destroy(std::list<Satellite*>& satellites) override {
-        if (!isInvisible() && !isDead()) {
+        if (!isInvisible() && !isDead())
+        {
+            // Create component parts
             satellites.push_back(new HubbleTelescope(*this));
             satellites.push_back(new HubbleComputer(*this));
             satellites.push_back(new HubbleLeftArray(*this));
             satellites.push_back(new HubbleRightArray(*this));
+
+            // Create fragments
+            //for (int i = 0; i < 3; i++)
+            //{
+            //    Angle angle;
+            //    angle.setDegrees(random(0.0, 360.0));
+            //    satellites.push_back(new Fragment(*this, angle));
+            //}
             kill();
         }
     }

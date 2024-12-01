@@ -21,6 +21,7 @@ class TestStarlink;
 class TestCrewDragon;
 class TestGPS;
 class TestShip;
+class TestPart;
 
 // for add()
 class Acceleration;
@@ -42,6 +43,7 @@ class Velocity
    friend TestCrewDragon;
    friend TestGPS;
    friend TestShip;
+   friend TestPart;
 
    
 public:

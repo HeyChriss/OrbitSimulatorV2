@@ -2,6 +2,7 @@
 #include "satellite.h"
 #include "velocity.h"
 #include "uiDraw.h"
+#include "Fragment.h"
 
 class TestSputnik;
 
@@ -47,12 +48,12 @@ public:
     {
         if (!isInvisible() && !isDead())
         {
-            // Create 4 fragments
+            // Sputnik breaks into 4 fragments
             for (int i = 0; i < 4; i++)
             {
-                Angle fragmentAngle;
-                fragmentAngle.setDegrees(random(0.0, 360.0));
-                satellites.push_back(new Satellite(*this, fragmentAngle));
+                Angle angle;
+                angle.setDegrees(random(0.0, 360.0));
+                satellites.push_back(new Fragment(*this, angle));
             }
             kill();
         }

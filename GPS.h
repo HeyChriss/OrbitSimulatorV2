@@ -1,8 +1,10 @@
 #pragma once
 #include "satellite.h"
 #include "velocity.h"
+#include "part.h"
 #include "uiDraw.h"
 #include <vector>
+#include "Fragment.h"
 
 class TestGPS;
 
@@ -10,22 +12,10 @@ class TestGPS;
 * GPS CENTER
 * Center component of a destroyed GPS satellite
 *********************************************/
-class GPSCenter : public Satellite
+class GPSCenter : public Part
 {
 public:
-    GPSCenter(const Satellite& parent) :
-        Satellite(0, 7.0, 0.001)
-    {
-        this->pos = parent.getPosition();
-        this->velocity = Velocity();
-        this->timeDilation = 48.0;
-    }
-
-    virtual void move(double time) override
-    {
-        Satellite::move(time * timeDilation);
-        angle.add(-angularVelocity * (timeDilation - 1.0));
-    }
+    GPSCenter(const Satellite& parent) : Part(7.0, 0.001, parent) {}
 
     virtual void draw(ogstream& gout) override
     {
@@ -37,46 +27,26 @@ public:
     {
         if (!isInvisible() && !isDead())
         {
-            createFragments(satellites, 3);
+            // Create 3 fragments
+            for (int i = 0; i < 3; i++)
+            {
+                Angle angle;
+                angle.setDegrees(random(0.0, 360.0));
+                satellites.push_back(new Fragment(*this, angle));
+            }
             kill();
         }
     }
-
-protected:
-    void createFragments(std::list<Satellite*>& satellites, int count)
-    {
-        for (int i = 0; i < count; i++)
-        {
-            Angle fragmentAngle;
-            fragmentAngle.setDegrees(random(0.0, 360.0));
-            satellites.push_back(new Satellite(*this, fragmentAngle));
-        }
-    }
-
-private:
-    double timeDilation;
 };
 
 /*********************************************
 * GPS LEFT ARRAY
 * Left solar array of a destroyed GPS satellite
 *********************************************/
-class GPSLeftArray : public Satellite
+class GPSLeftArray : public Part
 {
 public:
-    GPSLeftArray(const Satellite& parent) :
-        Satellite(0, 8.0, 0.001)
-    {
-        this->pos = parent.getPosition();
-        this->velocity = Velocity();
-        this->timeDilation = 48.0;
-    }
-
-    virtual void move(double time) override
-    {
-        Satellite::move(time * timeDilation);
-        angle.add(-angularVelocity * (timeDilation - 1.0));
-    }
+    GPSLeftArray(const Satellite& parent) : Part(8.0, 0.001, parent) {}
 
     virtual void draw(ogstream& gout) override
     {
@@ -93,46 +63,26 @@ public:
     {
         if (!isInvisible() && !isDead())
         {
-            createFragments(satellites, 3);
+            // Create 3 fragments
+            for (int i = 0; i < 3; i++)
+            {
+                Angle angle;
+                angle.setDegrees(random(0.0, 360.0));
+                satellites.push_back(new Fragment(*this, angle));
+            }
             kill();
         }
     }
-
-protected:
-    void createFragments(std::list<Satellite*>& satellites, int count)
-    {
-        for (int i = 0; i < count; i++)
-        {
-            Angle fragmentAngle;
-            fragmentAngle.setDegrees(random(0.0, 360.0));
-            satellites.push_back(new Satellite(*this, fragmentAngle));
-        }
-    }
-
-private:
-    double timeDilation;
 };
 
 /*********************************************
 * GPS RIGHT ARRAY
 * Right solar array of a destroyed GPS satellite
 *********************************************/
-class GPSRightArray : public Satellite
+class GPSRightArray : public Part
 {
 public:
-    GPSRightArray(const Satellite& parent) :
-        Satellite(0, 8.0, 0.001)
-    {
-        this->pos = parent.getPosition();
-        this->velocity = Velocity();
-        this->timeDilation = 48.0;
-    }
-
-    virtual void move(double time) override
-    {
-        Satellite::move(time * timeDilation);
-        angle.add(-angularVelocity * (timeDilation - 1.0));
-    }
+    GPSRightArray(const Satellite& parent) : Part(8.0, 0.001, parent) {}
 
     virtual void draw(ogstream& gout) override
     {
@@ -149,24 +99,16 @@ public:
     {
         if (!isInvisible() && !isDead())
         {
-            createFragments(satellites, 3);
+            // Create 3 fragments
+            for (int i = 0; i < 3; i++)
+            {
+                Angle angle;
+                angle.setDegrees(random(0.0, 360.0));
+                satellites.push_back(new Fragment(*this, angle));
+            }
             kill();
         }
     }
-
-protected:
-    void createFragments(std::list<Satellite*>& satellites, int count)
-    {
-        for (int i = 0; i < count; i++)
-        {
-            Angle fragmentAngle;
-            fragmentAngle.setDegrees(random(0.0, 360.0));
-            satellites.push_back(new Satellite(*this, fragmentAngle));
-        }
-    }
-
-private:
-    double timeDilation;
 };
 
 /*********************************************
@@ -210,7 +152,14 @@ public:
             satellites.push_back(new GPSCenter(*this));
             satellites.push_back(new GPSLeftArray(*this));
             satellites.push_back(new GPSRightArray(*this));
-            createFragments(satellites, 2);
+
+            // Create fragments
+            for (int i = 0; i < 2; i++)
+            {
+                Angle fragmentAngle;
+                fragmentAngle.setDegrees(random(0.0, 360.0));
+                satellites.push_back(new Fragment(*this, fragmentAngle));
+            }
             kill();
         }
     }

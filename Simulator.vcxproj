@@ -153,8 +153,10 @@
     <ClInclude Include="acceleration.h" />
     <ClInclude Include="angle.h" />
     <ClInclude Include="CrewDragon.h" />
+    <ClInclude Include="Fragment.h" />
     <ClInclude Include="GPS.h" />
     <ClInclude Include="Hubble.h" />
+    <ClInclude Include="Part.h" />
     <ClInclude Include="position.h" />
     <ClInclude Include="Satellite.h" />
     <ClInclude Include="Ship.h" />
@@ -164,8 +166,10 @@
     <ClInclude Include="testAcceleration.h" />
     <ClInclude Include="testAngle.h" />
     <ClInclude Include="TestCrewDragon.h" />
+    <ClInclude Include="TestFragment.h" />
     <ClInclude Include="TestGPS.h" />
     <ClInclude Include="TestHubble.h" />
+    <ClInclude Include="TestPart.h" />
     <ClInclude Include="testPosition.h" />
     <ClInclude Include="TestSatellite.h" />
     <ClInclude Include="TestShip.h" />

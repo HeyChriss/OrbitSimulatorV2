@@ -20,6 +20,9 @@ class TestSatellite;
 class Interface;
 class TestSatellite;
 class TestShip;
+class TestPart;
+class TestFragment;
+
 
 
 /*********************************************
@@ -31,6 +34,10 @@ class Satellite
 public:
     friend TestSatellite;
     friend TestShip;
+    friend TestPart;
+    friend class Fragment;
+    friend TestFragment;
+
 
 
     // constructors

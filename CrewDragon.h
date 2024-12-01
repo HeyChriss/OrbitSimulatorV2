@@ -2,6 +2,7 @@
 #include "satellite.h"
 #include "velocity.h"
 #include "uiDraw.h"
+#include "Fragment.h"
 
 class TestCrewDragon;
 
@@ -15,11 +16,14 @@ public:
     }
 
     void destroy(std::list<Satellite*>& satellites) override {
-        if (!isInvisible() && !isDead()) {
-            for (int i = 0; i < 4; i++) {
+        if (!isInvisible() && !isDead())
+        {
+            // Create 4 fragments
+            for (int i = 0; i < 4; i++)
+            {
                 Angle angle;
                 angle.setDegrees(random(0.0, 360.0));
-                satellites.push_back(new Satellite(*this, angle));
+                satellites.push_back(new Fragment(*this, angle));
             }
             kill();
         }
@@ -43,11 +47,14 @@ public:
     }
 
     void destroy(std::list<Satellite*>& satellites) override {
-        if (!isInvisible() && !isDead()) {
-            for (int i = 0; i < 2; i++) {
+        if (!isInvisible() && !isDead())
+        {
+            // Create 2 fragments
+            for (int i = 0; i < 2; i++)
+            {
                 Angle angle;
                 angle.setDegrees(random(0.0, 360.0));
-                satellites.push_back(new Satellite(*this, angle));
+                satellites.push_back(new Fragment(*this, angle));
             }
             kill();
         }
@@ -71,11 +78,14 @@ public:
     }
 
     void destroy(std::list<Satellite*>& satellites) override {
-        if (!isInvisible() && !isDead()) {
-            for (int i = 0; i < 2; i++) {
+        if (!isInvisible() && !isDead())
+        {
+            // Create 2 fragments
+            for (int i = 0; i < 2; i++)
+            {
                 Angle angle;
                 angle.setDegrees(random(0.0, 360.0));
-                satellites.push_back(new Satellite(*this, angle));
+                satellites.push_back(new Fragment(*this, angle));
             }
             kill();
         }
@@ -123,16 +133,19 @@ public:
     }
 
     void destroy(std::list<Satellite*>& satellites) override {
-        if (!isInvisible() && !isDead()) {
+        if (!isInvisible() && !isDead())
+        {
+            // Create component parts
             satellites.push_back(new CrewDragonCenter(*this));
             satellites.push_back(new CrewDragonLeft(*this));
             satellites.push_back(new CrewDragonRight(*this));
 
-            // Add 2 fragments
-            for (int i = 0; i < 2; i++) {
+            // Create fragments
+            for (int i = 0; i < 2; i++)
+            {
                 Angle angle;
                 angle.setDegrees(random(0.0, 360.0));
-                satellites.push_back(new Satellite(*this, angle));
+                satellites.push_back(new Fragment(*this, angle));
             }
             kill();
         }
