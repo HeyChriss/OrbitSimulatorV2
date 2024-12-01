@@ -2,7 +2,7 @@
  * Header File:
  *    SATELLITE
  * Author:
- *    <your name here>
+ *    Chris Mijango and Seth Chen
  * Summary:
  *    Base class for all satellites in orbit
  ************************************************************************/
@@ -19,6 +19,7 @@
 class TestSatellite;
 class Interface;
 class TestSatellite;
+class TestShip;
 
 
 /*********************************************
@@ -29,6 +30,7 @@ class Satellite
 {
 public:
     friend TestSatellite;
+    friend TestShip;
 
 
     // constructors
@@ -69,7 +71,7 @@ public:
     virtual void draw(ogstream& gout) {}
     virtual void destroy(std::list<Satellite*>& satellites) {}
     virtual void move(double time);
-    virtual void input(const Interface& ui, std::list<Satellite*>& satellites) {}
+    virtual void input(const Interface& ui) {} // std::list<Satellite*>& satellites
 
 protected:
     Velocity velocity;        // speed and direction
@@ -84,4 +86,3 @@ protected:
     bool useRandom;
 #endif // DEBUG
 };
-

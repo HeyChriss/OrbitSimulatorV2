@@ -2,7 +2,7 @@
  * Source File:
  *    SIMULATOR
  * Author:
- *    <your name here>
+ *    Chris Mijangos and Seth Chen
  * Summary:
  *    The main simulator class that handles the orbital simulation
  ************************************************************************/
@@ -15,6 +15,7 @@
 #include "starlink.h"
 #include "crewDragon.h"
 #include "GPS.h"
+#include "Ship.h"
 using namespace std;
 
 /*********************************************
@@ -31,7 +32,13 @@ public:
         pHubble(new Hubble()),
         pStarlink(new Starlink()),
         pCrewDragon(new CrewDragon()),
-        pGPS(new GPS())
+        pGPS(new GPS()),
+        pGPS2(new GPS(GPS().getInitialPositions()[1].first, GPS().getInitialPositions()[1].second)),
+        pGPS3(new GPS(GPS().getInitialPositions()[2].first, GPS().getInitialPositions()[2].second)),
+        pGPS4(new GPS(GPS().getInitialPositions()[3].first, GPS().getInitialPositions()[3].second)),
+        pGPS5(new GPS(GPS().getInitialPositions()[4].first, GPS().getInitialPositions()[4].second)),
+        pGPS6(new GPS(GPS().getInitialPositions()[5].first, GPS().getInitialPositions()[5].second)),
+        pShip(new Ship())
     {
         // Initialize the random stars
         for (int i = 0; i < NUM_STARS; i++)
@@ -52,10 +59,16 @@ public:
         delete pStarlink;
         delete pCrewDragon;
         delete pGPS;
+        delete pGPS2;
+        delete pGPS3;
+        delete pGPS4;
+        delete pGPS5;
+        delete pGPS6;
+        delete pShip;
     }
 
     // Move everything forward one time unit
-    void update()
+    void update(const Interface& pUI)
     {
         // Move Sputnik according to physics (includes orbital motion)
         if (pSputnik && !pSputnik->isDead())
@@ -75,6 +88,27 @@ public:
 
         if (pGPS && !pGPS->isDead())
             pGPS->move(1.0);
+
+        if (pGPS2 && !pGPS2->isDead())
+            pGPS2->move(1.0);
+
+        if (pGPS3 && !pGPS3->isDead())
+            pGPS3->move(1.0);
+
+        if (pGPS4 && !pGPS4->isDead())
+            pGPS4->move(1.0);
+
+        if (pGPS5 && !pGPS5->isDead())
+            pGPS5->move(1.0);
+
+        if (pGPS6 && !pGPS6->isDead())
+            pGPS6->move(1.0);
+
+        if (pShip && !pShip->isDead())
+        {
+            pShip->input(pUI);
+            pShip->move(1.0);
+        }
 
         // Update star phases for twinkling
         for (int i = 0; i < NUM_STARS; i++)
@@ -108,6 +142,24 @@ public:
         if (pGPS && !pGPS->isDead())
             pGPS->draw(gout);
 
+        if (pGPS2 && !pGPS2->isDead())
+            pGPS2->draw(gout);
+
+        if (pGPS3 && !pGPS3->isDead())
+            pGPS3->draw(gout);
+
+        if (pGPS4 && !pGPS4->isDead())
+            pGPS4->draw(gout);
+
+        if (pGPS5 && !pGPS5->isDead())
+            pGPS5->draw(gout);
+
+        if (pGPS6 && !pGPS6->isDead())
+            pGPS6->draw(gout);
+
+        if (pShip && !pShip->isDead())
+            pShip->draw(gout);
+
     }
 
 private:
@@ -117,6 +169,12 @@ private:
     CrewDragon* pCrewDragon;
     Starlink* pStarlink;
     GPS* pGPS;
+    GPS* pGPS2;
+    GPS* pGPS3;
+    GPS* pGPS4;
+    GPS* pGPS5;
+    GPS* pGPS6;
+    Ship* pShip;
     static const int NUM_STARS = 100;
     Position stars[NUM_STARS];     // Array of star positions
     uint8_t phases[NUM_STARS];     // Array of star phases
@@ -132,7 +190,7 @@ void callBack(const Interface* pUI, void* p)
     Simulator* pSim = (Simulator*)p;
 
     // Update the simulation
-    pSim->update();
+    pSim->update(*pUI);
 
     // Draw everything
     Position pos;  // Center of the screen

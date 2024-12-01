@@ -9,6 +9,7 @@
 #include "TestStarlink.h"
 #include "TestCrewDragon.h"
 #include "TestGPS.h"
+#include "TestShip.h"
 
 /*****************************************************************
  * TEST RUNNER
@@ -26,7 +27,7 @@ void testRunner()
 	TestStarlink().run();
 	TestCrewDragon().run();
 	TestGPS().run();
-	//TestSputnik().run();
+	TestShip().run();
 
 
 }

@@ -60,9 +60,16 @@
     <ClCompile Include="GPS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Ship.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TestShip.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include=".gitignore" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="acceleration.h">
@@ -135,6 +142,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="TestGPS.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Ship.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TestShip.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

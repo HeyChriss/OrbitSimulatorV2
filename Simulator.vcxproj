@@ -134,16 +134,19 @@
     <ClCompile Include="Hubble.cpp" />
     <ClCompile Include="position.cpp" />
     <ClCompile Include="Satellite.cpp" />
+    <ClCompile Include="Ship.cpp" />
     <ClCompile Include="Simulator.cpp" />
     <ClCompile Include="Sputnik.cpp" />
     <ClCompile Include="Starlink.cpp" />
     <ClCompile Include="test.cpp" />
     <ClCompile Include="TestSatellite.cpp" />
+    <ClCompile Include="TestShip.cpp" />
     <ClCompile Include="uiDraw.cpp" />
     <ClCompile Include="uiInteract.cpp" />
     <ClCompile Include="velocity.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include=".gitignore" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -154,6 +157,7 @@
     <ClInclude Include="Hubble.h" />
     <ClInclude Include="position.h" />
     <ClInclude Include="Satellite.h" />
+    <ClInclude Include="Ship.h" />
     <ClInclude Include="Sputnik.h" />
     <ClInclude Include="Starlink.h" />
     <ClInclude Include="test.h" />
@@ -164,6 +168,7 @@
     <ClInclude Include="TestHubble.h" />
     <ClInclude Include="testPosition.h" />
     <ClInclude Include="TestSatellite.h" />
+    <ClInclude Include="TestShip.h" />
     <ClInclude Include="TestSputnik.h" />
     <ClInclude Include="TestStarlink.h" />
     <ClInclude Include="testVelocity.h" />
