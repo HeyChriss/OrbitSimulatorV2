@@ -38,4 +38,17 @@ void Ship::input(const Interface& ui)
         pos.addMetersX(velocity.getDX());
         pos.addMetersY(velocity.getDY());
     }
+
+    // Fire projectile when space is pressed
+    if (ui.isSpace() && !isDead() && !isInvisible())
+    {
+
+        Projectile* projectile = new Projectile(*this, angle.getRadians());
+        satellites.push_back(projectile);
+
+        // Debug log
+        std::cout << "Projectile fired! Current satellite count: " << satellites.size() << std::endl;
+
+    }
+
 }

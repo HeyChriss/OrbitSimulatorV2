@@ -12,6 +12,7 @@
 #include "TestShip.h"
 #include "TestPart.h"
 #include "TestFragment.h"
+#include "TestProjectile.h"
 
 /*****************************************************************
  * TEST RUNNER
@@ -32,6 +33,6 @@ void testRunner()
 	TestShip().run();
 	TestPart().run();
 	TestFragment().run();
-
+	TestProjectile().run();
 
 }

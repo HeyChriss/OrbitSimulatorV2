@@ -37,6 +37,8 @@ public:
     friend TestPart;
     friend class Fragment;
     friend TestFragment;
+    friend class Projectile;
+    friend TestProjectile;
 
 
 

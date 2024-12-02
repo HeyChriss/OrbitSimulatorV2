@@ -158,6 +158,7 @@
     <ClInclude Include="Hubble.h" />
     <ClInclude Include="Part.h" />
     <ClInclude Include="position.h" />
+    <ClInclude Include="Projectile.h" />
     <ClInclude Include="Satellite.h" />
     <ClInclude Include="Ship.h" />
     <ClInclude Include="Sputnik.h" />
@@ -171,6 +172,7 @@
     <ClInclude Include="TestHubble.h" />
     <ClInclude Include="TestPart.h" />
     <ClInclude Include="testPosition.h" />
+    <ClInclude Include="TestProjectile.h" />
     <ClInclude Include="TestSatellite.h" />
     <ClInclude Include="TestShip.h" />
     <ClInclude Include="TestSputnik.h" />

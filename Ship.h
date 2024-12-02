@@ -13,6 +13,7 @@
 #include "Satellite.h"
 #include "uiInteract.h"
 #include "uiDraw.h"
+#include "Projectile.h"
 
 class TestShip;
 
@@ -21,12 +22,16 @@ class Ship : public Satellite
 
 private:
     bool isThrusting;  // Track if engines are firing
+    std::list<Satellite*>& satellites; // Reference to satellite list for projectiles
 
 public:
     friend TestShip;
 
     // constructor
-    Ship() : Satellite(0, 10.0, 0.0), isThrusting(false)
+    Ship(std::list<Satellite*>& satellites) :
+        Satellite(0, 10.0, 0.0),
+        isThrusting(false),
+        satellites(satellites)
     {
         pos.setPixelsX(-450.0);
         pos.setPixelsY(450.0);

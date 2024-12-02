@@ -38,8 +38,22 @@ public:
         pGPS4(new GPS(GPS().getInitialPositions()[3].first, GPS().getInitialPositions()[3].second)),
         pGPS5(new GPS(GPS().getInitialPositions()[4].first, GPS().getInitialPositions()[4].second)),
         pGPS6(new GPS(GPS().getInitialPositions()[5].first, GPS().getInitialPositions()[5].second)),
-        pShip(new Ship())
+        pShip(new Ship(satellites))
     {
+
+        // Initialize satellites list with initial satellites
+        // satellites.push_back(pSputnik);
+        // satellites.push_back(pHubble);
+        // satellites.push_back(pStarlink);
+        // satellites.push_back(pCrewDragon);
+        // satellites.push_back(pGPS);
+        // satellites.push_back(pGPS2);
+        // satellites.push_back(pGPS3);
+        // satellites.push_back(pGPS4);
+        // satellites.push_back(pGPS5);
+        // satellites.push_back(pGPS6);
+        // satellites.push_back(pShip);
+
         // Initialize the random stars
         for (int i = 0; i < NUM_STARS; i++)
         {
@@ -70,6 +84,15 @@ public:
     // Move everything forward one time unit
     void update(const Interface& pUI)
     {
+
+        for (Satellite* satellite : satellites)
+        {
+            if (!satellite->isDead())
+            {
+                satellite->move(1.0);
+            }
+        }
+        
         // Move Sputnik according to physics (includes orbital motion)
         if (pSputnik && !pSputnik->isDead())
             pSputnik->move(1.0);
@@ -160,9 +183,19 @@ public:
         if (pShip && !pShip->isDead())
             pShip->draw(gout);
 
+        for (Satellite* satellite : satellites)
+        {
+            if (!satellite->isDead())
+            {
+                satellite->draw(gout);
+            }
+        }
+
+
     }
 
 private:
+    std::list<Satellite*> satellites;
     Position ptUpperRight;         // Size of the screen
     Sputnik* pSputnik;            // The Sputnik satellite
     Hubble* pHubble;

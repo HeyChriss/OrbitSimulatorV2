@@ -3,19 +3,26 @@
 #include "velocity.h"
 #include "uiDraw.h"
 #include "Fragment.h"
+#include "part.h"
 
 class TestCrewDragon;
 
-// Components
-class CrewDragonCenter : public Satellite {
+/*********************************************
+* CREW DRAGON CENTER
+* Center component of a destroyed Crew Dragon spacecraft
+*********************************************/
+class CrewDragonCenter : public Part
+{
 public:
-    CrewDragonCenter(const Satellite& parent) : Satellite(0, 6.0, 0.0) {
-        pos = parent.getPosition();
-        velocity = Velocity();
-        timeDilation = 48.0;
+    CrewDragonCenter(const Satellite& parent) : Part(6.0, 0.0, parent) {}
+
+    virtual void draw(ogstream& gout) override {
+        if (!isInvisible() && !isDead())
+            gout.drawCrewDragonCenter(pos, angle.getRadians());
     }
 
-    void destroy(std::list<Satellite*>& satellites) override {
+    virtual void destroy(std::list<Satellite*>& satellites) override
+    {
         if (!isInvisible() && !isDead())
         {
             // Create 4 fragments
@@ -28,56 +35,24 @@ public:
             kill();
         }
     }
-
-    void draw(ogstream& gout) override {
-        if (!isInvisible() && !isDead())
-            gout.drawCrewDragonCenter(pos, angle.getRadians());
-    }
-
-private:
-    double timeDilation;
 };
 
-class CrewDragonLeft : public Satellite {
+/*********************************************
+* CREW DRAGON LEFT
+* Left side component of a destroyed Crew Dragon spacecraft
+*********************************************/
+class CrewDragonLeft : public Part
+{
 public:
-    CrewDragonLeft(const Satellite& parent) : Satellite(0, 6.0, 0.0) {
-        pos = parent.getPosition();
-        velocity = Velocity();
-        timeDilation = 48.0;
-    }
+    CrewDragonLeft(const Satellite& parent) : Part(6.0, 0.0, parent) {}
 
-    void destroy(std::list<Satellite*>& satellites) override {
-        if (!isInvisible() && !isDead())
-        {
-            // Create 2 fragments
-            for (int i = 0; i < 2; i++)
-            {
-                Angle angle;
-                angle.setDegrees(random(0.0, 360.0));
-                satellites.push_back(new Fragment(*this, angle));
-            }
-            kill();
-        }
-    }
-
-    void draw(ogstream& gout) override {
+    virtual void draw(ogstream& gout) override {
         if (!isInvisible() && !isDead())
             gout.drawCrewDragonLeft(pos, angle.getRadians());
     }
 
-private:
-    double timeDilation;
-};
-
-class CrewDragonRight : public Satellite {
-public:
-    CrewDragonRight(const Satellite& parent) : Satellite(0, 6.0, 0.0) {
-        pos = parent.getPosition();
-        velocity = Velocity();
-        timeDilation = 48.0;
-    }
-
-    void destroy(std::list<Satellite*>& satellites) override {
+    virtual void destroy(std::list<Satellite*>& satellites) override
+    {
         if (!isInvisible() && !isDead())
         {
             // Create 2 fragments
@@ -90,15 +65,38 @@ public:
             kill();
         }
     }
+};
 
-    void draw(ogstream& gout) override {
+/*********************************************
+* CREW DRAGON RIGHT
+* Right side component of a destroyed Crew Dragon spacecraft
+*********************************************/
+class CrewDragonRight : public Part
+{
+public:
+    CrewDragonRight(const Satellite& parent) : Part(6.0, 0.0, parent) {}
+
+    virtual void draw(ogstream& gout) override {
         if (!isInvisible() && !isDead())
             gout.drawCrewDragonRight(pos, angle.getRadians());
     }
 
-private:
-    double timeDilation;
+    virtual void destroy(std::list<Satellite*>& satellites) override
+    {
+        if (!isInvisible() && !isDead())
+        {
+            // Create 2 fragments
+            for (int i = 0; i < 2; i++)
+            {
+                Angle angle;
+                angle.setDegrees(random(0.0, 360.0));
+                satellites.push_back(new Fragment(*this, angle));
+            }
+            kill();
+        }
+    }
 };
+
 
 
 
@@ -110,14 +108,16 @@ class CrewDragon : public Satellite
 {
 public:
     friend TestCrewDragon;
-    CrewDragon() : Satellite(0, 7.0, 0.0)  // age=0, radius=8.0 (larger than other satellites), no rotation
+    CrewDragon() : Satellite(0, 7.0, 0.0)  
+        // age=0, radius=8.0 (larger than other satellites), no rotation
     {
         // Initial position at ISS-like orbit (~400km altitude)
         pos.setMetersX(0.0);
         pos.setMetersY(8000000.0);  // 
 
         // Initial velocity for circular orbit at ISS altitude
-        velocity.setDX(-7900.0);  // m/s - slightly faster than Starlink due to lower orbit
+        // m/s - slightly faster than Starlink due to lower orbit
+        velocity.setDX(-7900.0);  
         velocity.setDY(0.0);      // m/s
 
         timeDilation = 48.0; // Same time dilation as other satellites

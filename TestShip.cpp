@@ -18,8 +18,9 @@
 void TestShip::constructor_default()
 {
     // setup
+    std::list<Satellite*> satellites;
     // exercise
-    Ship s;
+    Ship s(satellites);
 
     // verify
     assertEquals(s.radius, 10.0);
@@ -37,8 +38,9 @@ void TestShip::constructor_default()
  *********************************************/
 void TestShip::move_oneSecond()
 {
-    // Setup
-    Ship s;
+    // setup
+    std::list<Satellite*> satellites;
+    Ship s(satellites);
 
     // Exercise
     s.move(1.0);
@@ -56,8 +58,9 @@ void TestShip::move_oneSecond()
  *********************************************/
 void TestShip::move_tenSeconds()
 {
-    // Setup
-    Ship s;
+    // setup
+    std::list<Satellite*> satellites;
+    Ship s(satellites);
 
     // Exercise
     for (int i = 0; i < 10; i++)
@@ -211,8 +214,9 @@ void TestShip::input_downTenTimes()
  *********************************************/
 void TestShip::draw_visible()
 {
-    // Setup
-    Ship s;
+    // setup
+    std::list<Satellite*> satellites;
+    Ship s(satellites);
     s.dead = false;
     MockOgstream gout;
 
@@ -230,8 +234,9 @@ void TestShip::draw_visible()
  *********************************************/
 void TestShip::draw_invisible()
 {
-    // Setup
-    Ship s;
+    // setup
+    std::list<Satellite*> satellites;
+    Ship s(satellites);
     s.dead = false;
     s.age = 11;
     MockOgstream gout;
@@ -250,8 +255,9 @@ void TestShip::draw_invisible()
  *********************************************/
 void TestShip::draw_dead()
 {
-    // Setup
-    Ship s;
+    // setup
+    std::list<Satellite*> satellites;
+    Ship s(satellites);
     s.dead = true;
     MockOgstream gout;
 
@@ -270,8 +276,9 @@ void TestShip::draw_dead()
  *********************************************/
 void TestShip::draw_notDead()
 {
-    // Setup
-    Ship s;
+    // setup
+    std::list<Satellite*> satellites;
+    Ship s(satellites);
     s.dead = false;
     MockOgstream gout;
 
@@ -290,8 +297,9 @@ void TestShip::draw_notDead()
  *********************************************/
 void TestShip::getDefunct_dead()
 {
-    // Setup
-    Ship s;
+    // setup
+    std::list<Satellite*> satellites;
+    Ship s(satellites);
     s.dead = false;
     bool defunct;
 
@@ -310,8 +318,9 @@ void TestShip::getDefunct_dead()
  *********************************************/
 void TestShip::getDefunct_notDead()
 {
-    // Setup
-    Ship s;
+    // setup
+    std::list<Satellite*> satellites;
+    Ship s(satellites);
     s.dead = true;
     bool defunct;
 

@@ -25,6 +25,7 @@ class TestGPS;
 class TestShip;
 class TestPart;
 class TestFragment;
+class TestProjectile;
 
 
 /*********************************************
@@ -44,6 +45,7 @@ public:
    friend ::TestShip;
    friend ::TestPart;
    friend ::TestFragment;
+   friend ::TestProjectile;
 
    
    // constructors
