@@ -23,6 +23,9 @@ class TestStarlink;
 class TestCrewDragon;
 class TestGPS;
 class TestShip;
+class TestPart;
+class TestFragment;
+class TestProjectile;
 
 
 /*********************************************
@@ -40,6 +43,9 @@ public:
    friend ::TestCrewDragon;
    friend ::TestGPS;
    friend ::TestShip;
+   friend ::TestPart;
+   friend ::TestFragment;
+   friend ::TestProjectile;
 
    
    // constructors

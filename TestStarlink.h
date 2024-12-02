@@ -69,10 +69,10 @@ private:
         Starlink s;
 
         // Verify
-        verify(s.getAge() == 0, __FUNCTION__);
-        verify(s.getRadius() == 6.0, __FUNCTION__);  // Starlink is smaller
-        verify(s.isDead() == false, __FUNCTION__);
-        verify(std::abs(s.getAngle().getRadians() - 0.0) <= 0.001, __FUNCTION__);
+        assertEquals(s.age, 0);
+        assertEquals(s.radius, 6.0);
+        assertEquals(s.dead, false);
+        assertEquals(s.angle.radians, 0.0);
     }
 
     void constructor_initialPosition()
@@ -135,21 +135,16 @@ private:
 
     void test_isDead()
     {
-        // Setup
+        // SETUP - directly set member variables
         Starlink s;
+        s.dead = false;
+        s.age = 20;
 
-        // Initially alive
-        verify(s.isDead() == false, __FUNCTION__);
-
-        // Move past invisible phase
-        for (int i = 0; i < 11; i++)
-            s.move(1.0);
-
-        // Kill it
+        // EXERCISE
         s.kill();
 
-        // Should now be dead
-        verify(s.isDead() == true, __FUNCTION__);
+        // VERIFY - directly check member variable
+        assertEquals(s.dead, true);
     }
 
     void move_oneSecond()

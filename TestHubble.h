@@ -241,7 +241,7 @@ private:
 
         // Verify
         verify(hubble.isDead() == true, __FUNCTION__);
-        verify(satellites.size() == 4, __FUNCTION__);  // All 4 components
+        verify(satellites.size() == 4, __FUNCTION__);  // All 4 components + Fragments
     }
 
     void test_destroyTelescope()

@@ -10,6 +10,9 @@
 #include "TestCrewDragon.h"
 #include "TestGPS.h"
 #include "TestShip.h"
+#include "TestPart.h"
+#include "TestFragment.h"
+#include "TestProjectile.h"
 
 /*****************************************************************
  * TEST RUNNER
@@ -28,6 +31,8 @@ void testRunner()
 	TestCrewDragon().run();
 	TestGPS().run();
 	TestShip().run();
-
+	TestPart().run();
+	TestFragment().run();
+	TestProjectile().run();
 
 }

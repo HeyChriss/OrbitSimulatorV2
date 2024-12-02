@@ -2,64 +2,71 @@
 #include "satellite.h"
 #include "velocity.h"
 #include "uiDraw.h"
+#include "part.h"
+#include "Fragment.h"
 
 class TestStarlink;
 
-// Components
-class StarlinkBody : public Satellite {
+/*********************************************
+* STARLINK BODY
+* Body component of a destroyed Starlink satellite
+*********************************************/
+class StarlinkBody : public Part
+{
 public:
-    StarlinkBody(const Satellite& parent) : Satellite(0, 2.0, 0.0) {
-        pos = parent.getPosition();
-        velocity = Velocity();
-        timeDilation = 48.0;
-    }
+    StarlinkBody(const Satellite& parent) : Part(2.0, 0.0, parent) {}
 
-    void destroy(std::list<Satellite*>& satellites) override {
-        if (!isInvisible() && !isDead()) {
-            for (int i = 0; i < 3; i++) {
-                Angle angle;
-                angle.setDegrees(random(0.0, 360.0));
-                satellites.push_back(new Satellite(*this, angle));
-            }
-            kill();
-        }
-    }
-
-    void draw(ogstream& gout) override {
+    void draw(ogstream& gout) override
+    {
         if (!isInvisible() && !isDead())
             gout.drawStarlinkBody(pos, angle.getRadians());
     }
 
-private:
-    double timeDilation;
-};
-
-class StarlinkArray : public Satellite {
-public:
-    StarlinkArray(const Satellite& parent) : Satellite(0, 4.0, 0.0) {
-        pos = parent.getPosition();
-        velocity = Velocity();
-        timeDilation = 48.0;
-    }
-
-    void destroy(std::list<Satellite*>& satellites) override {
-        if (!isInvisible() && !isDead()) {
-            for (int i = 0; i < 3; i++) {
+    void destroy(std::list<Satellite*>& satellites) override
+    {
+        if (!isInvisible() && !isDead())
+        {
+            // Create 3 fragments
+            for (int i = 0; i < 3; i++)
+            {
                 Angle angle;
                 angle.setDegrees(random(0.0, 360.0));
-                satellites.push_back(new Satellite(*this, angle));
+                satellites.push_back(new Fragment(*this, angle));
             }
             kill();
         }
     }
+};
 
-    void draw(ogstream& gout) override {
+/*********************************************
+* STARLINK ARRAY
+* Solar array component of a destroyed Starlink satellite
+*********************************************/
+class StarlinkArray : public Part
+{
+public:
+    StarlinkArray(const Satellite& parent) : Part(4.0, 0.0, parent) {}
+
+    void draw(ogstream& gout) override
+    {
         if (!isInvisible() && !isDead())
             gout.drawStarlinkArray(pos, angle.getRadians());
     }
 
-private:
-    double timeDilation;
+    void destroy(std::list<Satellite*>& satellites) override
+    {
+        if (!isInvisible() && !isDead())
+        {
+            // Create 3 fragments
+            for (int i = 0; i < 3; i++)
+            {
+                Angle angle;
+                angle.setDegrees(random(0.0, 360.0));
+                satellites.push_back(new Fragment(*this, angle));
+            }
+            kill();
+        }
+    }
 };
 
 
@@ -94,15 +101,18 @@ public:
     }
 
     void destroy(std::list<Satellite*>& satellites) override {
-        if (!isInvisible() && !isDead()) {
+        if (!isInvisible() && !isDead())
+        {
+            // Create component parts
             satellites.push_back(new StarlinkBody(*this));
             satellites.push_back(new StarlinkArray(*this));
 
-            // Add 2 fragments
-            for (int i = 0; i < 2; i++) {
+            // Create fragments
+            for (int i = 0; i < 2; i++)
+            {
                 Angle angle;
                 angle.setDegrees(random(0.0, 360.0));
-                satellites.push_back(new Satellite(*this, angle));
+                satellites.push_back(new Fragment(*this, angle));
             }
             kill();
         }
