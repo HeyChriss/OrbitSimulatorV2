@@ -2,7 +2,7 @@
  * Header File:
  *    User Interface Draw : put pixels on the screen
  * Author:
- *    Br. Helfrich
+ *    Chris Mijangos and Seth Chen
  * Summary:
  *    This is the code necessary to draw on the screen. We have a collection
  *    of procedural functions here because each draw function does not
@@ -89,7 +89,7 @@ class ogstreamDummy : public ogstream
 {
 public:
     ogstreamDummy(const Position& pt) {}
-    ~ogstreamDummy() {}
+    ~ogstreamDummy() { }
 
     // This is mostly for the text drawing stuff
     void flush();
@@ -137,7 +137,7 @@ class ogstreamFake : public ogstream
 {
 public:
     ogstreamFake(const Position& pt) {}
-    ~ogstreamFake() {}
+    ~ogstreamFake() { }
 
     // This is mostly for the text drawing stuff
     void flush();
@@ -186,4 +186,7 @@ public:
  ****************************************************************/
 int    random(int    min, int    max);
 double random(double min, double max);
+
+
+
 

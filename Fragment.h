@@ -1,62 +1,35 @@
+/***********************************************************************
+ * Header File:
+ *    Fragment
+ * Author:
+ *    Chris Mijangos and Seth Chen
+ * Summary:
+ *    Everything we need to know about Fragment
+ ************************************************************************/
 #pragma once
-#include "satellite.h"
-#include "velocity.h"
+#include "CelestialObject.h"
 #include "uiDraw.h"
 
-
-/*********************************************
-* FRAGMENT
-* A fragment of a destroyed satellite/part
-*********************************************/
-class Fragment : public Satellite
+class Fragment : public CelestialObject
 {
-
-    friend class TestFragment;
 public:
-    Fragment(const Satellite& parent, const Angle& direction) :
-        Satellite(0, 4.0, 0.001),
-        lifetime(random(50, 100)) // Fixed radius and small rotation for all fragments
+    friend class TestFragment;
+    Fragment(Position pos = Position(), Velocity vel = Velocity(), Angle angle = Angle()) : CelestialObject(pos, vel, angle)
     {
-        // Set position offset from parent
-        this->pos = parent.getPosition();
-        Position posKick;
-        posKick.setPixelsX(4.0 * sin(direction.getRadians()));
-        posKick.setPixelsY(4.0 * cos(direction.getRadians()));
-        pos.addMetersX(posKick.getMetersX());
-        pos.addMetersY(posKick.getMetersY());
+        this->lifetime = random(50, 100);
+        this->rotationAngle = random(0.0, 2.0 * 3.141);
+        this->radius = 2;
 
-        // Set velocity with random kick
-        this->velocity = parent.velocity;
-        double speed = random(1000.0, 3000.0);
-        Velocity kick;
-        kick.set(direction, speed);
-        velocity.add(kick);
+        // Fragments cannot break apart more; they simply expire after some time
+        this->hasBeenHit = true;
+    };
 
-        // Set time dilation
-        timeDilation = 48.0;
-    }
+    void update(double time, double gravity, double radius);
+    //   void breakApart(Simulator* sim);
+    void draw() { if (!getExpired()) ogs.drawFragment(pos, rotationAngle.getDegree()); }
+    bool isExpired() { if (lifetime <= 0) return true; else { lifetime--; return false; } }
 
-    virtual void move(double time) override
-    {
-        lifetime--;
-        if (lifetime <= 0)
-        {
-            kill();
-            return;
-        } 
-        Satellite::move(time * timeDilation);
-        angle.add(-angularVelocity * (timeDilation - 1.0));
-        
-    }
-
-    virtual void draw(ogstream& gout) override
-    {
-        if (!isInvisible() && !isDead())
-            gout.drawFragment(pos, angle.getRadians());
-    }
-
-private:
-    double timeDilation;
+protected:
     int lifetime;
 
 };

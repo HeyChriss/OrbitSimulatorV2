@@ -1,280 +1,119 @@
-#pragma once
-#include "Projectile.h"
-#include "unitTest.h"
-#include "position.h"
-#include "velocity.h"
-#include "angle.h"
-#include "Ship.h"
-#include "Satellite.h"
+﻿/***********************************************************************
+ * Header File:
+ *    Prijectile
+ * Author:
+ *    Chris Mijangos and Seth Chen
+ * Summary:
+ *    Everything we need to know about Projectile
+ ************************************************************************/
+#ifndef testProjectile_h
+#define testProjectile_h
 
+#include <iostream>
+#include "projectile.h"
+#include "ship.h"
+#include <cassert>
+#include "unitTest.h"
+
+/*******************************
+ * TEST Projectile
+ * A friend class for Projectile which contains the Projectile unit tests
+ ********************************/
 class TestProjectile : public UnitTest
 {
 public:
     void run()
     {
-        // Constructor tests
-        test_construct();
-        test_constructWithRotation();
-        test_offset();
-        test_velocity();
-
-        // Lifetime tests
-        test_lifetime();
-        test_expireAfter70Frames();
-        test_notExpiredBefore70Frames();
-
-        // Movement tests
-        test_moveWithTimeDilation();
-
-        // State tests
-        test_initiallyInvisible();
-        test_visibleAfter10Frames();
-        test_deadWhenKilled();
-
-        // Drawing tests
-        test_draw();
-        test_noDraw_whenInvisible();
-        test_noDraw_whenDead();
+        testConstructorFromShip();
+        testUpdate();
+        testExpiration();
 
         report("Projectile");
     }
 
 private:
-    // Mock ogstream for testing draw calls
-    class MockOgstream : public ogstream
+    // Test helper to create a ship at a specific position and rotation
+    Spaceship* createShipAtPosition(double x, double y, double rotation)
     {
-    public:
-        MockOgstream() : drawCalled(false) {}
-        void drawProjectile(const Position& pos) override {
-            drawCalled = true;
-            lastDrawPosition = pos;
+        Position pos;
+        pos.setMeters(x, y);
+        Velocity vel(0.0, 0.0);
+        Spaceship* ship = new Spaceship(pos, vel);
+        Angle angle;
+        angle.setDegree(rotation);
+        ship->addRotation(angle);
+        return ship;
+    }
+
+    void testConstructorFromShip()
+    {
+        // Setup - create ship at position with 45 degree rotation
+        Spaceship* ship = createShipAtPosition(1000.0, 2000.0, 45.0);
+        Physics physics;
+
+        // Exercise
+        Projectile projectile(ship);
+
+        // Verify - projectile should be at ship's position
+        assertEquals(projectile.getPosition().getMetersX(), 1000.0);
+        assertEquals(projectile.getPosition().getMetersY(), 2000.0);
+
+        // Get expected velocities using the same physics calculations used in Projectile constructor
+        double speed = 10000.0;
+        double rotation = ship->getRotation().getDegree();
+        double expectedVx = physics.horizontalAcceleration(speed, rotation);
+        double expectedVy = physics.verticalAcceleration(speed, rotation);
+
+        // Verify velocities
+        assertEquals(projectile.getVelocity().getDx(), expectedVx);
+
+        // Cleanup
+        delete ship;
+    }
+
+    void testUpdate()
+    {
+        // Setup - create ship pointing straight up
+        Spaceship* ship = createShipAtPosition(0.0, 0.0, 0.0);
+        Projectile projectile(ship);
+
+        double time = 1.0;
+        double gravity = 0.0;
+        double radius = 0.0;
+
+        // Exercise - update for one second
+        projectile.update(time, gravity, radius);
+
+        // Verify - with initial velocity of 10000 m/s straight up
+        assertEquals(projectile.getPosition().getMetersY(), 10000.0);  // Moved up 10000m
+        assertEquals(projectile.getPosition().getMetersX(), 0.0);      // No horizontal movement
+
+        // Cleanup
+        delete ship;
+    }
+
+    void testExpiration()
+    {
+        // Setup
+        Spaceship* ship = createShipAtPosition(0.0, 0.0, 0.0);
+        Projectile projectile(ship);
+
+        // Exercise & Verify - projectile should expire after enough updates
+        bool hasExpired = false;
+        int updateCount = 0;
+        while (!hasExpired && updateCount < 100)
+        {
+            projectile.update(1.0, 0.0, 0.0);
+            hasExpired = projectile.isExpired();
+            updateCount++;
         }
-        bool wasDrawCalled() const { return drawCalled; }
-        Position getLastDrawPosition() const { return lastDrawPosition; }
-    private:
-        bool drawCalled;
-        Position lastDrawPosition;
-    };
 
-    void test_construct()
-    {
-        // Setup
-        std::list<Satellite*> satellites;
-        Ship parent(satellites);
+        assertUnit(hasExpired == true);  // Should expire eventually
+        assertUnit(updateCount > 0 && updateCount < 100);  // Should expire within reasonable time
 
-        // Exercise
-        Projectile projectile(parent, 0.0);
-
-        // Verify
-        assertEquals(projectile.getRadius(), 1.0);
-        assertEquals(projectile.lifetime, 70);
-        assertUnit(!projectile.isDead());
-    }
-
-    void test_constructWithRotation()
-    {
-        // Setup
-        std::list<Satellite*> satellites;
-        Ship parent(satellites);
-        double rotation = M_PI_2;
-
-        // Exercise
-        Projectile projectile(parent, rotation);
-
-        // Verify projectile position is offset to the right
-        Position pos = projectile.getPosition();
-        Position parentPos = parent.getPosition();
-        double dx = pos.getMetersX() - parentPos.getMetersX();
-        double dy = pos.getMetersY() - parentPos.getMetersY();
-
-        // Should be offset 19 pixels right
-        assertUnit(dx > 0);
-        assertEquals(dy, 0.0);
-    }
-
-    void test_offset()
-    {
-        // Setup
-        std::list<Satellite*> satellites;
-        Ship parent(satellites);
-        double rotation = 0.0;
-
-        // Exercise
-        Projectile projectile(parent, rotation);
-
-        // Verify offset is 19 pixels forward
-        Position pos = projectile.getPosition();
-        Position parentPos = parent.getPosition();
-        double dy = pos.getMetersY() - parentPos.getMetersY();
-        assertEquals(dy, 19.0 * pos.getZoom());  // Convert pixels to meters
-    }
-
-    void test_velocity()
-    {
-        // Setup
-        std::list<Satellite*> satellites;
-        Ship parent(satellites);
-        parent.velocity.dx = 0.0;
-        parent.velocity.dy = 0.0;  // Zero out parent velocity for clean test
-        double rotation = 0.0;  // pointing up
-
-        // Exercise
-        Projectile projectile(parent, rotation);
-
-        // Verify velocity is 9000 m/s upward
-        assertEquals(projectile.velocity.getDX(), 0.0);
-        assertEquals(projectile.velocity.getDY(), 9000.0);
-    }
-
-    void test_lifetime()
-    {
-        // Setup
-        std::list<Satellite*> satellites;
-        Ship parent(satellites);
-        Projectile projectile(parent, 0.0);
-
-        // Verify initial lifetime
-        assertEquals(projectile.lifetime, 70);
-    }
-
-    void test_expireAfter70Frames()
-    {
-        // Setup
-        std::list<Satellite*> satellites;
-        Ship parent(satellites);
-        Projectile projectile(parent, 0.0);
-
-        // Exercise - move for full lifetime
-        for (int i = 0; i <= 70; i++)
-            projectile.move(1.0);
-
-        // Verify
-        assertUnit(projectile.isDead());
-    }
-
-    void test_notExpiredBefore70Frames()
-    {
-        // Setup
-        std::list<Satellite*> satellites;
-        Ship parent(satellites);
-        Projectile projectile(parent, 0.0);
-
-        // Exercise - move for 69 frames
-        for (int i = 0; i < 69; i++)
-            projectile.move(1.0);
-
-        // Verify still alive
-        assertUnit(!projectile.isDead());
-    }
-
-    void test_moveWithTimeDilation()
-    {
-        // Setup
-        std::list<Satellite*> satellites;
-        Ship parent(satellites);
-        Projectile projectile(parent, 0.0);
-        Position pos1 = projectile.getPosition();
-
-        // Exercise
-        projectile.move(1.0);
-
-        // Verify movement scaled by time dilation
-        Position pos2 = projectile.getPosition();
-        double distance = sqrt(pow(pos2.getMetersX() - pos1.getMetersX(), 2) +
-            pow(pos2.getMetersY() - pos1.getMetersY(), 2));
-        assertUnit(distance > 9000.0);  // Should move more than base speed due to time dilation
-    }
-
-    void test_initiallyInvisible()
-    {
-        // Setup
-        std::list<Satellite*> satellites;
-        Ship parent(satellites);
-        Projectile projectile(parent, 0.0);
-
-        // Verify
-        assertUnit(projectile.isInvisible());
-    }
-
-    void test_visibleAfter10Frames()
-    {
-        // Setup
-        std::list<Satellite*> satellites;
-        Ship parent(satellites);
-        Projectile projectile(parent, 0.0);
-
-        // Move for 11 frames
-        for (int i = 0; i < 11; i++)
-            projectile.move(1.0);
-
-        // Verify
-        assertUnit(!projectile.isInvisible());
-    }
-
-    void test_deadWhenKilled()
-    {
-        // Setup
-        std::list<Satellite*> satellites;
-        Ship parent(satellites);
-        Projectile projectile(parent, 0.0);
-        projectile.age = 10; // Make the object visible (bypass invisibility)
-
-        // Exercise
-        projectile.kill();
-
-        // Verify
-        assertUnit(projectile.isDead());
-    }
-
-    void test_draw()
-    {
-        // Setup
-        std::list<Satellite*> satellites;
-        Ship parent(satellites);
-        Projectile projectile(parent, 0.0);
-        MockOgstream gout;
-
-        // Age past invisible phase
-        for (int i = 0; i < 11; i++)
-            projectile.move(1.0);
-
-        // Exercise
-        projectile.draw(gout);
-
-        // Verify
-        assertUnit(gout.wasDrawCalled());
-    }
-
-    void test_noDraw_whenInvisible()
-    {
-        // Setup
-        std::list<Satellite*> satellites;
-        Ship parent(satellites);
-        Projectile projectile(parent, 0.0);
-        MockOgstream gout;
-
-        // Exercise - draw while still invisible
-        projectile.draw(gout);
-
-        // Verify
-        assertUnit(!gout.wasDrawCalled());
-    }
-
-    void test_noDraw_whenDead()
-    {
-        // Setup
-        std::list<Satellite*> satellites;
-        Ship parent(satellites);
-        Projectile projectile(parent, 0.0);
-        MockOgstream gout;
-
-        projectile.kill();
-
-        // Exercise
-        projectile.draw(gout);
-
-        // Verify
-        assertUnit(!gout.wasDrawCalled());
+        // Cleanup
+        delete ship;
     }
 };
 
+#endif /* testProjectile_h */

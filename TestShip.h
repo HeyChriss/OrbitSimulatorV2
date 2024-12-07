@@ -1,82 +1,45 @@
 /***********************************************************************
  * Header File:
- *    TEST SHIP
+ *    Test Ship
  * Author:
- *    Chris Mijango & Seth Chen
+ *    Chris Mijangos and Seth Chen
  * Summary:
- *    The test ship class
+ *    Everything we need to know about Ship
  ************************************************************************/
 
-#pragma once
-#include "unitTest.h"
-#include "Ship.h"
+#ifndef testShip_h
+#define testShip_h
 
-class TestShip : UnitTest
+
+#include <iostream>
+#include "ship.h"
+#include <cassert>
+#include "unitTest.h"
+
+#include <stdio.h>
+
+/*******************************
+ * TEST Hubble
+ * A friend class for Hubble which contains the Hubble unit tests
+ ********************************/
+class TestShip : public UnitTest
 {
 public:
     void run()
     {
-        // constructor test
-        constructor_default();
-
-        // move tests
-        move_oneSecond();
-        move_tenSeconds();
-
-        // input tests
-        input_noInput();
-        input_rightOnce();
-        input_rightTenTimes();
-        input_leftOnce();
-        input_leftTenTimes();
-        input_downOnce();
-        input_downTenTimes();
-
-        // draw tests
-        draw_visible();
-        draw_invisible();
-        draw_dead();
-        draw_notDead();
-
-        // getDefunct tests
-        getDefunct_dead();
-        getDefunct_notDead();
+        testConstructor();
+        testThrustUp();
+        testThrustDown();
 
         report("Ship");
     }
 
 private:
-    void constructor_default();
-    void move_oneSecond();
-    void move_tenSeconds();
-    void input_noInput();
-    void input_rightOnce();
-    void input_rightTenTimes();
-    void input_leftOnce();
-    void input_leftTenTimes();
-    void input_downOnce();
-    void input_downTenTimes();
-    void draw_visible();
-    void draw_invisible();
-    void draw_dead();
-    void draw_notDead();
-    void getDefunct_dead();
-    void getDefunct_notDead();
-
-    // Mock ogstream for testing draw calls
-    class MockOgstream : public ogstream
-    {
-    public:
-        friend TestShip;
-        MockOgstream() : drawCalled(false) {}
-        void drawShip(const Position& pos, double angle, bool thrust) override
-        {
-            drawCalled = true;
-        }
-        bool wasDrawCalled() const { return drawCalled; }
-    private:
-        bool drawCalled;
-    };
-
+    void testConstructor();
+    void testThrustUp();
+    void testThrustDown();
 };
+
+
+#endif /* testShip_h */
 

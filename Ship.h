@@ -1,109 +1,40 @@
 /***********************************************************************
  * Header File:
- *    SHIP
+ *    Ship
  * Author:
- *    Chris Mijango & Seth Chen
+ *    Chris Mijangos and Seth Chen
  * Summary:
- *    The ship class
+ *    Everything we need to know about Ship
  ************************************************************************/
-
-
 #pragma once
-#include "acceleration.h"
-#include "Satellite.h"
-#include "uiInteract.h"
-#include "uiDraw.h"
-#include "Projectile.h"
-
-class TestShip;
-
-class Ship : public Satellite
+#include "satellite.h"
+class Spaceship : public Satellite
 {
-
+	friend class TestShip;
+public:
+	Spaceship(Position pos = Position(), Velocity vel = Velocity(), Angle angle =
+		Angle()) : Satellite(pos, vel, angle) {
+		this->defective = false;
+		this->thrust = false;
+		this->radius = 10;
+		this->numFragments = 4;
+		this->rotationAngle.setDegree(0);
+	};
+	bool isHit(CelestialObject* other);
+	void update(double time, double gravity, double planetRadius);
+	void setThrust(bool t) { this->thrust = t; }
+	bool getThrust() { return this->thrust; };
+	void draw() { ogs.drawShip(pos, rotationAngle.getDegree(), getThrust()); }
 private:
-    bool isThrusting;  // Track if engines are firing
-    std::list<Satellite*>& satellites; // Reference to satellite list for projectiles
-
+	bool thrust;
+};
+class DummySpaceship : Spaceship {
+	friend class TestShip;
 public:
-    friend TestShip;
-
-    // constructor
-    Ship(std::list<Satellite*>& satellites) :
-        Satellite(0, 10.0, 0.0),
-        isThrusting(false),
-        satellites(satellites)
-    {
-        pos.setPixelsX(-450.0);
-        pos.setPixelsY(450.0);
-        velocity.setDX(0.0);
-        velocity.setDY(-2000.0);
-        angle.setDown();
-    }
-
-    void draw(ogstream& gout) override
-    {
-        if (!isInvisible() && !isDead())
-            gout.drawShip(pos, angle.getRadians(), isThrusting);
-    }
-
-    void input(const Interface& ui) override;
-    
-
-    void move(double time) override
-    {
-        Satellite::move(48.0);
-
-        // Reset angle change to remove time dilation effect on rotation
-        angle.add(-angularVelocity * (48.0 - 1.0));
-    }
-
-    void destroy(std::list<Satellite*>& satellites) override
-    {
-        // lab 12
-    }
-
-    bool getDefunct() override { return dead; }
+	DummySpaceship() : Spaceship() {}
+	void update(double time = 1, double gravity = 0.0, double planetRadius = 0.0)
+		override;
+	void draw() override { assert(false); }
 };
 
-class FakeShip : public Satellite
-{
-public:
-    FakeShip() : Satellite(0, 10.0, 0.0)
-    {
-        pos.setPixelsX(-450.0);
-        pos.setPixelsY(450.0);
-        velocity.setDX(0.0);
-        velocity.setDY(-2000.0);
-        angle.setDown();
-    }
-
-    void input(bool isRight, bool isLeft, bool isDown, bool isSpace)
-    {
-        if (isRight)
-            this->angle.add(0.1);
-        if (isLeft)
-            this->angle.add(-0.1);
-
-        if (isDown)
-        {
-            // Calculate thrust effect based on the direction the ship is pointing
-            Acceleration thrust;
-            for (int i = 0; i < 48; i++)
-            {
-                thrust.setDDX(2.0 * sin(angle.getRadians()));
-                thrust.setDDY(2.0 * cos(angle.getRadians()));
-
-                // udpate velocity
-                // velocity.add(thrust, 1.0);
-                velocity.addDX(thrust.getDDX() * 1.0);  // v = v0 + at
-                velocity.addDY(thrust.getDDY() * 1.0);
-
-                // Update the position using the current velocity
-                // pos.add(thrust, velocity, 48.0);
-                pos.addMetersX(velocity.getDX() * 1.0);   // x = x0 + vt
-                pos.addMetersY(velocity.getDY() * 1.0);
-            }
-        }
-    }
-};
 

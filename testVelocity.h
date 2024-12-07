@@ -1,767 +1,154 @@
-/***********************************************************************
+﻿/***********************************************************************
  * Header File:
- *    TEST VELOCITY
+ *    Test Velocity
  * Author:
- *    <your name here>
+ *    Chris Mijangos and Seth Chen
  * Summary:
- *    Unit tests for the Velocity class.
+ *    Everything we need to know about testing velocity
  ************************************************************************/
+#ifndef testVelocity_h
+#define testVelocity_h
 
-#pragma once
-
-#include "unitTest.h"
+#include <iostream>
+#include <cassert>
 #include "velocity.h"
+#include "unitTest.h"
+#include "angle.h"
 #include <cmath>
-#define M_PI 3.14159265358979323846 // Define pi
-#define M_PI_2 (M_PI / 2)           // Define pi/2
 
-/*********************************************
- * TEST VELOCITY
- * Unit tests for Velocity
- *********************************************/
+const double M_PI = std::acos(-1.0);
+
+using namespace std;
+
+/*******************************
+ * TEST Velocity
+ * A friend class for Velocity which contains the unit tests
+ ********************************/
 class TestVelocity : public UnitTest
 {
 public:
-   void run()
-   {
-      // Ticket 5: From before
-      constructor_default();
-      constructor_nonDefault();
-      getDX();
-      getDY();
-      getSpeed_up();
-      getSpeed_down();
-      getSpeed_left();
-      getSpeed_right();
-      getSpeed_diagonal();
-      setDX();
-      setDY();
-      set_up();
-      set_down();
-      set_left();
-      set_right();
-      set_diagonal();
-      addDX_zero();
-      addDX_value();
-      addDY_zero();
-      addDY_value();
-      add_stationary();
-      add_noTime();
-      add_moving4Seconds();
-      add_moving1Second();
+    void run()
+    {
+        testDefaultConstructor();
+        testParameterizedConstructor();
+        testSettersAndGetters();
+        testGetSpeed();
+        testGetAngle();
+        testAddMeters();
+        testAddPixels();
+        testAdditionOperator();
 
-      // Ticket 6: Reverse and add
-      reverse_stationary();
-      reverse_up();
-      reverse_down();
-      reverse_left();
-      reverse_right();
-      reverse_diagonal();
-      addV_stationary();
-      addV_nothing();
-      addV_moving();
-
-      report("Velocity");
-   }
+        report("Velocity");
+    }
 
 private:
-
-   /*****************************************************************
-    *****************************************************************
-    * CONSTRUCTOR
-    *****************************************************************
-    *****************************************************************/
-   
-   
-   /*********************************************
-    * name:    DEFAULT CONSTRUCTOR
-    * input:   nothing
-    * output:  zero
-    *********************************************/
-   void constructor_default()
-   {  // setup
-      // exercise
-      Velocity v;
-
-      // verify
-      assertEquals(v.dx, 0.0);
-      assertEquals(v.dy, 0.0);
-   }  // teardown
-      
-   /*********************************************
-    * name:    NON DEFAULT CONSTRUCTOR
-    * input:   2.3, 4.5
-    * output:  (2.3, 4.5)
-    *********************************************/
-   void constructor_nonDefault()
-   {  // setup
-      double dx = 2.3;
-      double dy = 4.5;
-      
-      // exercise
-      Velocity v(dx, dy);
-
-      // verify
-      assertEquals(v.dx, 2.3);
-      assertEquals(v.dy, 4.5);
-      assertEquals(dx, 2.3);
-      assertEquals(dy, 4.5);
-   }  // teardown
-
-   /*****************************************************************
-    *****************************************************************
-    * GETTERS
-    *****************************************************************
-    *****************************************************************/
-
-   /*********************************************
-    * name:    GET DX
-    * input:   (2.3, 4.5)
-    * output:  2.3
-    *********************************************/
-   void getDX()
-   {  // setup
-      Velocity v;
-      v.dx = 2.3;
-      v.dy = 4.5;
-      double dx = 99.9;
-
-      // exercise
-      dx = v.getDX();
-
-      // verify
-      assertEquals(v.dx, 2.3);
-      assertEquals(v.dy, 4.5);
-      assertEquals(dx, 2.3);
-   }  // teardown
-
-   /*********************************************
-    * name:    GET DY
-    * input:   (2.3, 4.5)
-    * output:  4.5
-    *********************************************/
-   void getDY()
-   {  // setup
-      Velocity v;
-      v.dx = 2.3;
-      v.dy = 4.5;
-      double dy = 99.9;
-
-      // exercise
-      dy = v.getDY();
-
-      // verify
-      assertEquals(v.dx, 2.3);
-      assertEquals(v.dy, 4.5);
-      assertEquals(dy, 4.5);
-   }  // teardown
-   
-   /*********************************************
-    * name:    GET SPEED ZERO
-    * input:   (0.0, 0.0)
-    * output:  0.0
-    *********************************************/
-   void getSpeed_zero()
-   {  // setup
-      Velocity v;
-      v.dx = 0.0;
-      v.dy = 0.0;
-      double s = 99.9;
-
-      // exercise
-      s = v.getSpeed();
-
-      // verify
-      assertEquals(v.dx, 0.0);
-      assertEquals(v.dy, 0.0);
-      assertEquals(s, 0.0);
-   }  // teardown
-   
-   /*********************************************
-    * name:    GET SPEED RIGHT
-    * input:   (2.3, 0.0)
-    * output:  2.3
-    *********************************************/
-   void getSpeed_right()
-   {  // setup
-      Velocity v;
-      v.dx = 2.3;
-      v.dy = 0.0;
-      double s = 99.9;
-
-      // exercise
-      s = v.getSpeed();
-
-      // verify
-      assertEquals(v.dx, 2.3);
-      assertEquals(v.dy, 0.0);
-      assertEquals(s, 2.3);
-   }  // teardown
-
-   /*********************************************
-    * name:    GET SPEED UP
-    * input:   (0.0, 4.5)
-    * output:  4.5
-    *********************************************/
-   void getSpeed_up()
-   {  // setup
-      Velocity v;
-      v.dx = 0.0;
-      v.dy = 4.5;
-      double s = 99.9;
-
-      // exercise
-      s = v.getSpeed();
-
-      // verify
-      assertEquals(v.dx, 0.0);
-      assertEquals(v.dy, 4.5);
-      assertEquals(s, 4.5);
-   }  // teardown
-   
-   /*********************************************
-    * name:    GET SPEED LEFT
-    * input:   (-2.3, 0.0)
-    * output:  2.3
-    *********************************************/
-   void getSpeed_left()
-   {  // setup
-      Velocity v;
-      v.dx = -2.3;
-      v.dy = 0.0;
-      double s = 99.9;
-
-      // exercise
-      s = v.getSpeed();
-
-      // verify
-      assertEquals(v.dx, -2.3);
-      assertEquals(v.dy, 0.0);
-      assertEquals(s, 2.3);
-   }  // teardown
-
-   /*********************************************
-    * name:    GET SPEED DOWN
-    * input:   (0.0, -4.5)
-    * output:  4.5
-    *********************************************/
-   void getSpeed_down()
-   {  // setup
-      Velocity v;
-      v.dx = 0.0;
-      v.dy = -4.5;
-      double s = 99.9;
-
-      // exercise
-      s = v.getSpeed();
-
-      // verify
-      assertEquals(v.dx, 0.0);
-      assertEquals(v.dy, -4.5);
-      assertEquals(s, 4.5);
-   }  // teardown
-   
-   /*********************************************
-    * name:    GET SPEED DIAGONAL
-    * input:   (3.0, -4.0)
-    * output:  5.0
-    *********************************************/
-   void getSpeed_diagonal()
-   {  // setup
-      Velocity v;
-      v.dx = 3.0;
-      v.dy = -4.0;
-      double s = 99.9;
-
-      // exercise
-      s = v.getSpeed();
-
-      // verify
-      assertEquals(v.dx, 3.0);
-      assertEquals(v.dy, -4.0);
-      assertEquals(s, 5.0);
-   }  // teardown
-   
-   /*****************************************************************
-    *****************************************************************
-    * SETTERS
-    *****************************************************************
-    *****************************************************************/
-   
-   /*********************************************
-    * name:    SET DX
-    * input:   (99.9, 88.8) -1.1
-    * output:  (-1.1, 88.8)
-    *********************************************/
-   void setDX()
-   {  // setup
-      Velocity v;
-      v.dx = 99.9;
-      v.dy = 88.8;
-      double dx = -1.1;
-
-      // exercise
-      v.setDX(dx);
-
-      // verify
-      assertEquals(v.dx, -1.1);
-      assertEquals(v.dy, 88.8);
-      assertEquals(dx, -1.1);
-   }  // teardown
-
-   /*********************************************
-    * name:    SET DY
-    * input:   (99.9, 88.8) -1.1
-    * output:  (99.9, -1.1)
-    *********************************************/
-   void setDY()
-   {  // setup
-      Velocity v;
-      v.dx = 99.9;
-      v.dy = 88.8;
-      double dy = -1.1;
-
-      // exercise
-      v.setDY(dy);
-
-      // verify
-      assertEquals(v.dx, 99.9);
-      assertEquals(v.dy, -1.1);
-      assertEquals(dy, -1.1);
-   }  // teardown
-   
-   /*********************************************
-    * name:    SET UP
-    * input:   (-99.9, -88.8) 0 degreess, 3.3
-    * output:  (0.0, 3.3)
-    *********************************************/
-   void set_up()
-   {  // setup
-      Velocity v;
-      v.dx = -99.9;
-      v.dy = -88.8;
-      Angle angle;
-      angle.radians = 0.0; // up
-      double magnitude = 3.3;
-
-      // exercise
-      v.set(angle, magnitude);
-
-      // verify
-      assertEquals(v.dx, 0.0);
-      assertEquals(v.dy, 3.3);
-      assertEquals(angle.radians, 0.0);
-      assertEquals(magnitude, 3.3);
-   }
-   
-   /*********************************************
-    * name:    SET DOWN
-    * input:   (-99.9, -88.8) 180 degreess, 3.3
-    * output:  (0.0, -3.3)
-    *********************************************/
-   void set_down()
-   {  // setup
-      Velocity v;
-      v.dx = -99.9;
-      v.dy = -88.8;
-      Angle angle;
-      angle.radians = M_PI; // DOWN
-      double magnitude = 3.3;
-
-      // exercise
-      v.set(angle, magnitude);
-
-      // verify
-      assertEquals(v.dx, 0.0);
-      assertEquals(v.dy, -3.3);
-      assertEquals(angle.radians, M_PI);
-      assertEquals(magnitude, 3.3);
-   }
-
-   /*********************************************
-    * name:    SET RIGHT
-    * input:   (-99.9, -88.8) 90 degreess, 3.3
-    * output:  (3.3, 0.0)
-    *********************************************/
-   void set_right()
-   {  // setup
-      Velocity v;
-      v.dx = -99.9;
-      v.dy = -88.8;
-      Angle angle;
-      angle.radians = M_PI_2; // RIGHT
-      double magnitude = 3.3;
-
-      // exercise
-      v.set(angle, magnitude);
-
-      // verify
-      assertEquals(v.dx, 3.3);
-      assertEquals(v.dy, 0.0);
-      assertEquals(angle.radians, M_PI_2);
-      assertEquals(magnitude, 3.3);
-   }
-   
-   /*********************************************
-    * name:    SET LEFT
-    * input:   (-99.9, -88.8) 270 degreess, 3.3
-    * output:  (-3.3, 0.0)
-    *********************************************/
-   void set_left()
-   {  // setup
-      Velocity v;
-      v.dx = -99.9;
-      v.dy = -88.8;
-      Angle angle;
-      angle.radians = M_PI_2 + M_PI; // LEFT
-      double magnitude = 3.3;
-
-      // exercise
-      v.set(angle, magnitude);
-
-      // verify
-      assertEquals(v.dx, -3.3);
-      assertEquals(v.dy, 0.0);
-      assertEquals(angle.radians, M_PI_2 + M_PI);
-      assertEquals(magnitude, 3.3);
-   }
-   
-   /*********************************************
-    * name:    SET DIAGONAL
-    * input:   (-99.9, -88.8) ~57 degreess, 1.0
-    * output:  (0.84, 0.54)
-    *********************************************/
-   void set_diagonal()
-   {  // setup
-      Velocity v;
-      v.dx = -99.9;
-      v.dy = -88.8;
-      Angle angle;
-      angle.radians = 1.0; // up and right somewhat
-      double magnitude = 1.0;
-
-      // exercise
-      v.set(angle, magnitude);
-
-      // verify
-      assertEquals(v.dx, 0.8414);
-      assertEquals(v.dy, 0.5403);
-      assertEquals(angle.radians, 1.0);
-      assertEquals(magnitude, 1.0);
-   }
-   
-   /*********************************************
-    * name:    REVERSE STATIONARY
-    * input:   (0, 0)
-    * output:  (0, 0)
-    *********************************************/
-   void reverse_stationary()
-   {
-       Velocity v(0,0);
-       v.reverse();
-       assertEquals(v.getDX(), 0);
-       assertEquals(v.getDY(), 0);
-   }
-
-   /*********************************************
-    * name:    REVERSE UP
-    * input:   (0,  10)
-    * output:  (0, -10)
-    *********************************************/
-   void reverse_up()
-   {
-       Velocity v(0, 10);
-       v.reverse();
-       assertEquals(v.getDX(), 0);
-       assertEquals(v.getDY(), -10);
-   }
-
-   /*********************************************
-    * name:    REVERSE DOWN
-    * input:   (0, -12.34)
-    * output:  (0,  12.34)
-    *********************************************/
-   void reverse_down()
-   {
-       Velocity v(0, -12.34);
-       v.reverse();
-       assertEquals(v.getDX(), 0);
-       assertEquals(v.getDY(), 12.34);
-   }
-
-   /*********************************************
-    * name:    REVERSE LEFT
-    * input:   (-300, 0)
-    * output:  ( 300, 0)
-    *********************************************/
-   void reverse_left()
-   {
-       Velocity v(-300, 0);
-       v.reverse();
-       assertEquals(v.getDX(), 300);
-       assertEquals(v.getDY(), 0);
-   }
-
-   /*********************************************
-    * name:    REVERSE RIGHT
-    * input:   ( 0.0123, 0)
-    * output:  (-0.0123, 0)
-    *********************************************/
-   void reverse_right()
-   {
-       Velocity v(0.0123, 0);
-       v.reverse();
-       assertEquals(v.getDX(), -0.0123);
-       assertEquals(v.getDY(), 0);
-   }
-
-   /*********************************************
-    * name:    REVERSE DIAGONAL
-    * input:   ( 123.456, -7.89)
-    * output:  (-123.456,  7.89)
-    *********************************************/
-   void reverse_diagonal()
-   {
-       Velocity v(123.456, -7.89);
-       v.reverse();
-       assertEquals(v.getDX(), -123.456);
-       assertEquals(v.getDY(), 7.89);
-   }
-
-   /*****************************************************************
-    *****************************************************************
-    * ADD
-    *****************************************************************
-    *****************************************************************/
-   
-   /*********************************************
-    * name:    ADD DX  zero
-    * input:   (2.3, 4.5) 0.0
-    * output:  (2.3, 4.5)
-    *********************************************/
-   void addDX_zero()
-   {  // setup
-      Velocity v;
-      v.dx = 2.3;
-      v.dy = 4.5;
-      double dx = 0.0;
-
-      // exercise
-      v.addDX(dx);
-
-      // verify
-      assertEquals(v.dx, 2.3);
-      assertEquals(v.dy, 4.5);
-      assertEquals(dx, 0.0);
-   }  // teardown
-
-   /*********************************************
-    * name:    ADD DX  VALUE
-    * input:   (2.3, 4.5) 4.1
-    * output:  (6.4, 4.5)
-    *********************************************/
-   void addDX_value()
-   {  // setup
-      Velocity v;
-      v.dx = 2.3;
-      v.dy = 4.5;
-      double dx = 4.1;
-
-      // exercise
-      v.addDX(dx);
-
-      // verify
-      assertEquals(v.dx, 6.4);
-      assertEquals(v.dy, 4.5);
-      assertEquals(dx,  4.1);
-   }  // teardown
-
-   /*********************************************
-    * name:    ADD DY  zero
-    * input:   (2.3, 4.5) 0.0
-    * output:  (2.3, 4.5)
-    *********************************************/
-   void addDY_zero()
-   {  // setup
-      Velocity v;
-      v.dx = 2.3;
-      v.dy = 4.5;
-      double dy = 0.0;
-
-      // exercise
-      v.addDY(dy);
-
-      // verify
-      assertEquals(v.dx, 2.3);
-      assertEquals(v.dy, 4.5);
-      assertEquals(dy, 0.0);
-   }  // teardown
-
-   /*********************************************
-    * name:    ADD DY  VALUE
-    * input:   (2.3, 4.5) 4.1
-    * output:  (2.3, 8.6)
-    *********************************************/
-   void addDY_value()
-   {  // setup
-      Velocity v;
-      v.dx = 2.3;
-      v.dy = 4.5;
-      double dy = 4.1;
-
-      // exercise
-      v.addDY(dy);
-
-      // verify
-      assertEquals(v.dx, 2.3);
-      assertEquals(v.dy, 8.6);
-      assertEquals(dy, 4.1);
-   }  // teardown
-
-   /*********************************************
-    * name:    ADD  STATIONARY
-    * input:   v=(2.3, 4.5) a=(0.0, 0.0) t=0.0
-    * output:  (2.3, 4.5)
-    *********************************************/
-   void add_stationary()
-   {  // setup
-      Velocity v;
-      v.dx = 2.3;
-      v.dy = 4.5;
-      Acceleration a;
-      a.ddx = 0.0;
-      a.ddy = 0.0;
-      double t = 0.0;
-
-      // exercise
-      v.add(a, t);
-
-      // verify
-      assertEquals(v.dx, 2.3);
-      assertEquals(v.dy, 4.5);
-      assertEquals(a.ddx, 0.0);
-      assertEquals(a.ddy, 0.0);
-      assertEquals(t, 0.0);
-   }  // teardown
-
-   /*********************************************
-    * name:    ADD  TIME IS ZERO
-    * input:   v=(2.3, 4.5) a=(6.0, 7.0) t=0.0
-    * output:  (2.3, 4.5)
-    *********************************************/
-   void add_noTime()
-   {  // setup
-      Velocity v;
-      v.dx = 2.3;
-      v.dy = 4.5;
-      Acceleration a;
-      a.ddx = 6.0;
-      a.ddy = 7.0;
-      double t = 0.0;
-
-      // exercise
-      v.add(a, t);
-
-      // verify
-      assertEquals(v.dx, 2.3);
-      assertEquals(v.dy, 4.5);
-      assertEquals(a.ddx, 6.0);
-      assertEquals(a.ddy, 7.0);
-      assertEquals(t, 0.0);
-   }  // teardown
-
-   /*********************************************
-    * name:    ADD  ONE SECOND
-    * input:   v=(2.3, 4.5) a=(6.0, 7.0) t=1.0
-    * output:  (8.3, 11.5)
-    *********************************************/
-   void add_moving1Second()
-   {  // setup
-      Velocity v;
-      v.dx = 2.3;
-      v.dy = 4.5;
-      Acceleration a;
-      a.ddx = 6.0;
-      a.ddy = 7.0;
-      double t = 1.0;
-
-      // exercise
-      v.add(a, t);
-
-      // verify
-      assertEquals(v.dx, 8.3);  // 2.3 + 6.0*1
-      assertEquals(v.dy, 11.5); // 4.5 + 7.0*1
-      assertEquals(a.ddx, 6.0);
-      assertEquals(a.ddy, 7.0);
-      assertEquals(t, 1.0);
-   }  // teardown
-
-   /*********************************************
-    * name:    ADD  FOUR SECONDS
-    * input:   v=(2.3, 4.5) a=(6.0, 7.0) t=4.0
-    * output:  (14.3, 24.5)
-    *********************************************/
-   void add_moving4Seconds()
-   {  // setup
-      Velocity v;
-      v.dx = 2.3;
-      v.dy = 4.5;
-      Acceleration a;
-      a.ddx = 3.0;
-      a.ddy = 5.0;
-      double t = 4.0;
-
-      // exercise
-      v.add(a, t);
-
-      // verify
-      assertEquals(v.dx, 14.3); // 2.3 + 3.0*4
-      assertEquals(v.dy, 24.5); // 4.5 + 5.0*4
-      assertEquals(a.ddx, 3.0);
-      assertEquals(a.ddy, 5.0);
-      assertEquals(t, 4.0);
-   }  // teardown
-
-   /*********************************************
-    * name:    ADD  STATIONARY
-    * input:   vLHS=(0, 0) vRHS=(2.3, 4.5)
-    * output:  vLHS=(2.3, 4.5)
-    *********************************************/
-   void addV_stationary()
-   {
-       Velocity LHS(0, 0);
-       Velocity RHS(2.3, 4.5);
-       LHS.add(RHS);
-       assertEquals(LHS.getDX(), 2.3);
-       assertEquals(LHS.getDY(), 4.5);
-   }
-
-   /*********************************************
-    * name:    ADD  NOTHING
-    * input:   vLHS=(2.3, 4.5) vRHS=(0, 0)
-    * output:  vLHS=(2.3, 4.5)
-    *********************************************/
-   void addV_nothing()
-   {
-       Velocity LHS(2.3, 4.5);
-       Velocity RHS(0, 0);
-       LHS.add(RHS);
-       assertEquals(LHS.getDX(), 2.3);
-       assertEquals(LHS.getDY(), 4.5);
-   }
-
-   /*********************************************
-    * name:    ADD  MOVING
-    * input:   vLHS=(2.3, 4.5) vRHS=(100, 200)
-    * output:  vLHS=(102.3, 204.5)
-    *********************************************/
-   void addV_moving()
-   {
-       Velocity LHS(2.3, 4.5);
-       Velocity RHS(100, 200);
-       LHS.add(RHS);
-       assertEquals(LHS.getDX(), 102.3);
-       assertEquals(LHS.getDY(), 204.5);
-   }
+    void testDefaultConstructor()
+    {
+        // Setup
+        Velocity v;
+
+        // Verify
+        assertUnit(v.getDx() == 0.0f);
+        assertUnit(v.getDy() == 0.0f);
+    }
+
+    void testParameterizedConstructor()
+    {
+        // Setup
+        Velocity v(3.5f, -2.1f);
+
+        // Verify
+        float epsilon = 1e-6f;
+        assertUnit(fabs(v.getDx() - 3.5f) < epsilon);
+        assertUnit(fabs(v.getDy() - -2.1f) < epsilon);
+    }
+
+    void testSettersAndGetters()
+    {
+        // Setup
+        Velocity v;
+        v.setDx(4.5f);
+        v.setDy(-3.2f);
+
+        // Verify
+        float epsilon = 1e-6f;
+        assertUnit(fabs(v.getDx() - 4.5f) < epsilon);
+        assertUnit(fabs(v.getDy() - -3.2f) < epsilon);
+    }
+
+    void testGetSpeed()
+    {
+        // Setup
+        Velocity v(3.0f, 4.0f); // Speed = sqrt(3^2 + 4^2) = 5.0
+
+        // Verify
+        assertUnit(v.getSpeed() == 5.0f);
+    }
+
+    void testGetAngle()
+    {
+        // Setup
+        Velocity v(1.0f, 1.0f);
+        Angle angle = v.getAngle();
+
+        // Verify
+        float epsilon = 1e-6f;
+        assertUnit(fabs(angle.getRadian() - atan2(1.0, 1.0)) < epsilon);
+    }
+
+    void testAddMeters()
+    {
+        // Setup
+        Velocity v;
+        Angle angle(45.0); // 45 degrees = pi/4 radians
+
+        // Exercise
+        v.addMeters(10.0, angle); // Adds 10 meters at 45 degrees
+
+        // Verify
+        float epsilon = 1e-6f;
+        assertUnit(fabs(v.getDx() - (10.0 * sin(angle.getDegree()))) < epsilon);
+        assertUnit(fabs(v.getDy() - (10.0 * cos(angle.getDegree()))) < epsilon);
+    }
+
+    void testAddPixels()
+    {
+        // Setup
+        Velocity v;
+        Angle angle;
+        angle.setDegree(90.0); // Set angle to 90 degrees (π/2 radians)
+
+        // Exercise
+        v.addPixels(20.0, angle); // Adds 20 pixels at 90 degrees
+
+        // Verify
+        double dx = v.getDx(); // Raw `dx` value in meters
+        double dy = v.getDy();
+
+        // Expected values
+        double expectedDx = 20.0 * Velocity::metersFromPixels; // Scaled by `metersFromPixels`
+        double expectedDy = 0.0; // Since cos(90°) = 0
+
+        assertUnit(dx > expectedDx - 0.1 && dx < expectedDx + 0.1); // Account for floating-point errors
+        assertUnit(dy > expectedDy - 0.1 && dy < expectedDy + 0.1);
+    }
+
+    void testAdditionOperator()
+    {
+        // Setup
+        Velocity v1(3.0f, 4.0f);
+        Velocity v2(1.0f, 2.0f);
+
+        // Exercise
+        v1 += v2;
+
+        // Verify
+        assertUnit(v1.getDx() == 4.0f);
+        assertUnit(v1.getDy() == 6.0f);
+    }
 
 };
+
+#endif /* testVelocity_h */
+
+

@@ -127,19 +127,29 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="acceleration.cpp" />
     <ClCompile Include="angle.cpp" />
-    <ClCompile Include="CrewDragon.cpp" />
+    <ClCompile Include="celestialObject.cpp" />
+    <ClCompile Include="direction.cpp" />
+    <ClCompile Include="dragon.cpp" />
+    <ClCompile Include="earth.cpp" />
+    <ClCompile Include="fragment.cpp" />
     <ClCompile Include="GPS.cpp" />
     <ClCompile Include="Hubble.cpp" />
+    <ClCompile Include="object.cpp" />
+    <ClCompile Include="part.cpp" />
+    <ClCompile Include="physics.cpp" />
     <ClCompile Include="position.cpp" />
+    <ClCompile Include="projectile.cpp" />
     <ClCompile Include="Satellite.cpp" />
     <ClCompile Include="Ship.cpp" />
-    <ClCompile Include="Simulator.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="simulator.cpp" />
     <ClCompile Include="Sputnik.cpp" />
     <ClCompile Include="Starlink.cpp" />
     <ClCompile Include="test.cpp" />
-    <ClCompile Include="TestSatellite.cpp" />
+    <ClCompile Include="testAngle.cpp" />
+    <ClCompile Include="testhubble.cpp" />
+    <ClCompile Include="testPhysics.cpp" />
     <ClCompile Include="TestShip.cpp" />
     <ClCompile Include="uiDraw.cpp" />
     <ClCompile Include="uiInteract.cpp" />
@@ -148,29 +158,42 @@
   <ItemGroup>
     <None Include=".gitignore" />
     <None Include="packages.config" />
+    <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="acceleration.h" />
     <ClInclude Include="angle.h" />
+    <ClInclude Include="celestialObject.h" />
     <ClInclude Include="CrewDragon.h" />
+    <ClInclude Include="direction.h" />
+    <ClInclude Include="dragon.h" />
+    <ClInclude Include="earth.h" />
     <ClInclude Include="Fragment.h" />
     <ClInclude Include="GPS.h" />
     <ClInclude Include="Hubble.h" />
+    <ClInclude Include="object.h" />
     <ClInclude Include="Part.h" />
+    <ClInclude Include="physics.h" />
     <ClInclude Include="position.h" />
     <ClInclude Include="Projectile.h" />
     <ClInclude Include="Satellite.h" />
     <ClInclude Include="Ship.h" />
+    <ClInclude Include="simulator.h" />
     <ClInclude Include="Sputnik.h" />
+    <ClInclude Include="star.h" />
     <ClInclude Include="Starlink.h" />
     <ClInclude Include="test.h" />
     <ClInclude Include="testAcceleration.h" />
     <ClInclude Include="testAngle.h" />
-    <ClInclude Include="TestCrewDragon.h" />
+    <ClInclude Include="testCelestialObject.h" />
+    <ClInclude Include="testDirection.h" />
+    <ClInclude Include="testDragon.h" />
     <ClInclude Include="TestFragment.h" />
     <ClInclude Include="TestGPS.h" />
     <ClInclude Include="TestHubble.h" />
+    <ClInclude Include="testObject.h" />
     <ClInclude Include="TestPart.h" />
+    <ClInclude Include="testPhysics.h" />
     <ClInclude Include="testPosition.h" />
     <ClInclude Include="TestProjectile.h" />
     <ClInclude Include="TestSatellite.h" />

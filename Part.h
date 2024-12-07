@@ -1,43 +1,33 @@
+/***********************************************************************
+ * Header File:
+ *    Part
+ * Author:
+ *    Chris Mijangos and Seth Chen
+ * Summary:
+ *    Everything we need to know about part
+ ************************************************************************/
+
 #pragma once
-#include "satellite.h"
-#include "velocity.h"
-#include "Fragment.h"
-#include "angle.h"
+#include "celestialObject.h"
 
-
-/*********************************************
-* PART
-* Base class for satellite parts that break off during collision
-*********************************************/
-class Part : public Satellite
+class Part : public CelestialObject
 {
-    friend TestPart;
 public:
-    Part(double radius, double angularVelocity, const Satellite& parent) :
-        Satellite(0, radius, angularVelocity)
-    {
-        this->pos = parent.getPosition();
-        this->velocity = Velocity();
-        this->timeDilation = 48.0;
-    }
 
-    virtual void move(double time) override
-    {
-        Satellite::move(time * timeDilation);
-        angle.add(-angularVelocity * (timeDilation - 1.0));
-    }
+    friend class TestSatellite;
+    friend class TestPart;
 
-protected:
-    void createFragments(std::list<Satellite*>& satellites, int count)
+    Part(Position pos = Position(), Velocity vel = Velocity(), Angle angle = Angle()) : CelestialObject(pos, vel, angle)
     {
-        for (int i = 0; i < count; i++)
-        {
-            Angle fragmentAngle;
-            fragmentAngle.setDegrees(random(0.0, 360.0));
-            satellites.push_back(new Fragment(*this, fragmentAngle));
-        }
-    }
+        this->numFragments = 0;
+        this->radius = 1;
+        this->invincibilityCount = 0;
+    };
 
-    double timeDilation;
+    bool isHit(CelestialObject* other);
+    void update(double time, double gravity, double planetRadius);
+
+    string partOrigin;
+    int invincibilityCount;
 };
 

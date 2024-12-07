@@ -1,31 +1,42 @@
-/***********************************************************************
- * Source File:
- *    ANGLE
- * Author:
- *    <your name here>
- * Summary:
- *    Everything we need to know about a direction
- ************************************************************************/
+﻿#include <cmath>
+#include "angle.h" 
 
-#include "angle.h"
-#include <math.h>  // for floor()
-#include <cassert>
-using namespace std;
-
- /************************************
-  * ANGLE : NORMALIZE
-  ************************************/
-double Angle::normalize(double radians) const
+void Angle::normalize()
 {
-	while (radians > 2 * M_PI || radians < 0)
-	{
-		if (radians > 2 * M_PI)
-			radians -= 2 * M_PI;
-		if (radians < 0)
-			radians += 2 * M_PI;
-	}
-	return radians;
+    // Normalize within [-2π, 2π]
+    while (radAngle >= fullRevolutionRad) {
+        radAngle -= fullRevolutionRad;
+    }
+    while (radAngle < 0) {
+        radAngle += fullRevolutionRad;
+    }
+
+    // Ensure exact values at boundaries normalize to 0
+    if (fabs(radAngle - fullRevolutionRad) < 1e-9) {
+        radAngle = 0.0;
+    }
 }
 
+void Angle::setDegree(double degree) { this->radAngle = degree * pi / 180.0; normalize(); }
+void Angle::addDegree(double degree) { this->radAngle += degree * pi / 180.0; normalize(); };
+double Angle::getDegree() const { return radAngle * 180.0 / pi; }
 
+Angle& Angle::operator += (const Angle& twoD) {
+    this->radAngle += twoD.radAngle;
+    normalize();
+    return *this;
+}
 
+Angle& Angle::operator-=(const Angle& twoD)
+{
+    this->radAngle -= twoD.radAngle;
+    normalize();
+    return *this;
+}
+
+Angle& Angle::operator*=(const double scale)
+{
+    this->radAngle *= scale;
+    normalize();
+    return *this;
+}
