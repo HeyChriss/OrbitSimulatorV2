@@ -1,3 +1,12 @@
+/***********************************************************************
+ * Header File:
+ *    ubnitest
+ * Author:
+ *    Chris Mijangos and Seth Chen
+ * Summary:
+ *    Everything we need to know about unitests
+ ************************************************************************/
+
 #pragma once
 
 #undef assertUnit
@@ -6,7 +15,10 @@
 #undef assertStandardFixture
 #undef assertEmptyFixture
 
+#define NOT_YET_IMPLEMENTED false
+
 #define assertEquals(value, test) assertUnitParameters(closeEnough(value, test), #test, __LINE__, __FUNCTION__)
+#define assertEqualsLarge(value, test) assertUnitParameters(closeEnoughLarge(value, test), #test, __LINE__, __FUNCTION__)
 #define assertUnit(condition)              assertUnitParameters(condition, #condition, __LINE__, __FUNCTION__)
 
 #include <iostream>  // for std::cerr
@@ -33,16 +45,21 @@ private:
 
 protected:
 
-
-
     // for closeEnough() and assertEquals(), what is the tolerance?
     double tolerance = 0.0001;
+    double largeTolerance = 1.0;
 
     // utility function because floating point numbers are approximations
     bool closeEnough(double value, double test) const
     {
         double difference = value - test;
         return (difference >= -tolerance) && (difference <= tolerance);
+    }
+
+    bool closeEnoughLarge(double value, double test) const
+    {
+        double difference = value - test;
+        return (difference >= -largeTolerance) && (difference <= largeTolerance);
     }
 
     /*************************************************************
@@ -120,23 +137,5 @@ protected:
         }
     }
 
-
-    /*************************************************************
-     * VERIFY
-     * Simple verification of condition
-     *************************************************************/
-    void verify(bool condition, const char* function)
-    {
-        std::string sFunc(function);
-        if (!condition)
-        {
-            Failure failure{ "Failed", __LINE__ };
-            tests[sFunc].push_back(failure);
-        }
-        else
-        {
-            tests[sFunc]; // Register successful test
-        }
-    }
 
 };

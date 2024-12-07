@@ -1,97 +1,34 @@
 /***********************************************************************
  * Header File:
- *    SATELLITE
+ *    Satellite
  * Author:
- *    Chris Mijango and Seth Chen
+ *    Chris Mijangos and Seth Chen
  * Summary:
- *    Base class for all satellites in orbit
+ *    Everything we need to know about Satellite
  ************************************************************************/
-
-
 #pragma once
-
-#include "position.h"
-#include "velocity.h"
-#include "angle.h"
-#include "uiDraw.h"
-#include <list>
-
-class TestSatellite;
-class Interface;
-class TestSatellite;
-class TestShip;
-class TestPart;
-class TestFragment;
+#include "part.h"
 
 
-
-/*********************************************
- * SATELLITE
- * Base class for all the satellites in our simulation
- *********************************************/
-class Satellite
+class Satellite : public CelestialObject
 {
 public:
-    friend TestSatellite;
-    friend TestShip;
-    friend TestPart;
-    friend class Fragment;
-    friend TestFragment;
-    friend class Projectile;
-    friend TestProjectile;
+    friend class TestSatellite;
 
-
-
-    // constructors
-    Satellite(int age = 0, double radius = 0.0, double angularVelocity = 0.0)
-        : angularVelocity(angularVelocity), dead(false), age(age), radius(radius)
+    Satellite(Position pos = Position(), Velocity vel = Velocity(), Angle angle = Angle()) : CelestialObject(pos, vel, angle)
     {
-#ifdef NDEBUG
-        useRandom = true;
-#endif
+        this->radius = 10;
+        this->numFragments = 2;
+        this->defective = 0;
+    };
+
+    virtual void update(double time, double gravity, double planetRadius);
+    virtual void breakApart(Simulator* sim, vector<CelestialObject*> subParts = {})
+    {
+        CelestialObject::breakApart(sim, subParts);
     }
 
-    // Used to create parts and fragments
-    Satellite(const Satellite& parent, const Angle& direction);
-
-    // Used to create projectiles. They have specific speeds
-    Satellite(const Satellite& parent, const Position& offset, const Velocity& kick);
-
-    // Getters
-    double getRadius() const { return radius; }
-    bool isDead() const { return dead; }
-    bool isInvisible() const { return age < 10; }
-    const Angle& getAngle() const { return angle; }
-    const Position& getPosition() const { return pos; }
-
-
-    virtual int getAge() const { return age; }
-    //virtual double getRadius() const { return radius; }
-    // virtual const Position& getPosition() const { return pos; }
-    // virtual const Angle& getAngle() const { return angle; }
-    // virtual bool isDead() const { return dead; }
-    // virtual bool isInvisible() const { return age < 10; }
-
-    // Setters
-    virtual void kill() { if (!isInvisible()) dead = true; }
-
-    // Stuff to be overridden
-    virtual bool getDefunct() { return false; }
-    virtual void draw(ogstream& gout) {}
-    virtual void destroy(std::list<Satellite*>& satellites) {}
-    virtual void move(double time);
-    virtual void input(const Interface& ui) {} // std::list<Satellite*>& satellites
-
 protected:
-    Velocity velocity;        // speed and direction
-    Position pos;            // position in meters
-    Angle angle;            // angle satellite is pointed
-    double angularVelocity; // spin
-    bool dead;              // whether it is dead - to be cleaned
-    double radius;          // radius in meters
-    int age;               // how long have we been alive?
-    Acceleration getGravity(const Position& pos) const;
-#ifdef NDEBUG
-    bool useRandom;
-#endif // DEBUG
+    bool defective;
 };
+

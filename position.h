@@ -1,92 +1,87 @@
 /***********************************************************************
  * Header File:
- *    POSITION
+ *    Position
  * Author:
- *    <your name here>
+ *    Chris Mijangos and Seth Chen
  * Summary:
- *    Everything we need to know about a location on the screen.
+ *    Everything we need to know about Position
  ************************************************************************/
-
-
 #pragma once
 
 #include <iostream> 
 #include <cmath>
+#include "angle.h"
 
 class TestPosition;
 class Acceleration;
 class Velocity;
-class TestSatellite;
-class TestSputnik;
-class TestHubble;
-class TestStarlink;
-class TestCrewDragon;
-class TestGPS;
-class TestShip;
-class TestPart;
-class TestFragment;
-class TestProjectile;
-
 
 /*********************************************
  * Position
- * A single position on the field in Meters  
+ * A single position on the field in Meters
  *********************************************/
 class Position
 {
 public:
-   friend ::TestPosition;
-   friend ::TestSatellite;
-   friend :: TestSputnik;
-   friend ::TestHubble;
-   friend ::TestStarlink;
-   friend ::TestCrewDragon;
-   friend ::TestGPS;
-   friend ::TestShip;
-   friend ::TestPart;
-   friend ::TestFragment;
-   friend ::TestProjectile;
+    friend TestPosition;
 
-   
-   // constructors
-   Position()            : x(0.0), y(0.0)  {}
-   Position(double x, double y);
-   Position(const Position & pt) : x(pt.getMetersX()), y(pt.getMetersY()) {}
-   Position& operator = (const Position& pt);
+    Position() : x(0.0), y(0.0) {}
+    Position(double x, double y);
+    Position(const Position& pt) : x(pt.x), y(pt.y) {}
+    Position& operator = (const Position& pt);
 
-   // getters
-   double getMetersX()       const { return x; }
-   double getMetersY()       const { return y; }
-   double getPixelsX()       const { return x / metersFromPixels; }
-   double getPixelsY()       const { return y / metersFromPixels; }
-   double getZoom()          const { return metersFromPixels; }
+    // getters
+    double getMetersX()       const { return x; }
+    double getMetersY()       const { return y; }
+    double getPixelsX()       const { return x / metersFromPixels; }
+    double getPixelsY()       const { return y / metersFromPixels; }
 
-   // setters
-   void setZoom(double z) { metersFromPixels = z; }
-   void setMeters(double xMeters, double yMeters) { }
-   void setMetersX(double xMeters) { this->x = xMeters; }
-   void setMetersY(double yMeters) { this->y = yMeters; }
-   void setPixelsX(double xPixels) { this->x = xPixels * metersFromPixels; }
-   void setPixelsY(double yPixels) { this->y = yPixels * metersFromPixels; }
-   void addMetersX(double dxMeters) { setMetersX(getMetersX() + dxMeters); }
-   void addMetersY(double dyMeters) { setMetersY(getMetersY() + dyMeters); }
-   void addPixelsX(double dxPixels) { setPixelsX(getPixelsX() + dxPixels); }
-   void addPixelsY(double dyPixels) { setPixelsY(getPixelsY() + dyPixels); }
-   void add(const Acceleration& a, const Velocity& v, double t);
-   void reverse() {  }
+    // setters
+    void setMeters(double xMeters, double yMeters) { x = xMeters; y = yMeters; }
+    void setMetersX(double xMeters) { x = xMeters; }
+    void setMetersY(double yMeters) { y = yMeters; }
+    void setPixelsX(double xPixels) { x = xPixels * metersFromPixels; }
+    void setPixelsY(double yPixels) { y = yPixels * metersFromPixels; }
+    void addMetersX(double dxMeters) { setMetersX(getMetersX() + dxMeters); }
+    void addMetersY(double dyMeters) { setMetersY(getMetersY() + dyMeters); }
+    void addPixelsX(double dxPixels) { setPixelsX(getPixelsX() + dxPixels); }
+    void addPixelsY(double dyPixels) { setPixelsY(getPixelsY() + dyPixels); }
+    void addPixels(double totalPixels, Angle angle) {
+        double xPixels = totalPixels * sin(angle.getRadian());
+        double yPixels = totalPixels * cos(angle.getRadian());
 
+        this->addPixelsX(xPixels);
+        this->addPixelsY(yPixels);
+    }
+
+    void setZoom(double metersFromPixels)
+    {
+        this->metersFromPixels = metersFromPixels;
+    }
+
+    double getZoom() const { return metersFromPixels; }
 
 private:
-   double x;                 // horizontal position
-   double y;                 // vertical position
-   static double metersFromPixels;
+    double x;                 // horizontal position
+    double y;                 // vertical position
+    static double metersFromPixels;
 };
 
-
+/*********************************************
+ * COMPUTE DISTANCE
+ * Find the distance between two positions
+ *********************************************/
+inline double computeDistance(const Position& pos1, const Position& pos2)
+{
+    double differenceX = pos1.getMetersX() - pos2.getMetersX();
+    double differenceY = pos1.getMetersY() - pos2.getMetersY();
+    return sqrt((differenceX * differenceX) +
+        (differenceY * differenceY));
+}
 
 // stream I/O useful for debugging
-std::ostream & operator << (std::ostream & out, const Position& pt);
-std::istream & operator >> (std::istream & in,        Position& pt);
+std::ostream& operator << (std::ostream& out, const Position& pt);
+std::istream& operator >> (std::istream& in, Position& pt);
 
 
 /*********************************************
@@ -95,8 +90,10 @@ std::istream & operator >> (std::istream & in,        Position& pt);
  *********************************************/
 struct PT
 {
-   double x;
-   double y;
+    double x;
+    double y;
 };
+
+
 
 

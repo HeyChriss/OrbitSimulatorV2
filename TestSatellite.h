@@ -1,404 +1,195 @@
 /***********************************************************************
  * Header File:
- *    TEST SATELLITE
+ *    Testing Satellite
  * Author:
- *    <your name here>
+ *    Chris Mijangos and Seth Chen
  * Summary:
- *    A friend class for Satellite which contains the Satellite unit tests
+ *    Everything we need to know about testing satellites and collisions 
  ************************************************************************/
+#ifndef testSatellite_h
+#define testSatellite_h
 
-#pragma once
-
+#include <iostream>
+#include <cassert>
 #include "satellite.h"
+#include "gps.h"
+#include "dragon.h"
+#include "starlink.h"
+#include "hubble.h"
+#include "simulator.h"
 #include "unitTest.h"
-#define TEST
 
 using namespace std;
 
- /***************************************************
-  * TEST SATELLITE
-  * A friend class for Satellite which contains the Satellite unit tests
-  ***************************************************/
+/*******************************
+ * TEST Satellite
+ * A friend class for Satellite which contains the unit tests
+ ********************************/
 class TestSatellite : public UnitTest
 {
 public:
     void run()
     {
-        defaultConstructor();
-        constructor_stationaryNorth();
-        constructor_stationarySouth();
-        constructor_stationaryEast();
-        constructor_stationaryWest();
-        constructor_upNorth();
-        constructor_upEast();
-        constructor_rightNorth();
+        testDefaultConstructor();
+        testBreakApart();
+        testCollisionBehavior();
+        testSatelliteInitialStates();
+        testSatelliteVelocityCollisions();
+        testSatelliteTypesCollisions();
+        testBoundaryCollisions();
 
-        move_stationaryNorth();
-        move_stationaryNorthSpin();
-        move_stationaryEast();
-        move_upNorth();
-        move_upEast();
-        move_rightNorth();
-
-        report("Satellite");
+        report("Satellite and collision");
     }
 
 private:
-
-    // Helper Macros
-    #define assertEqualsTolerance(value, test, tol) \
-        assertUnitParameters((std::abs((value) - (test)) <= (tol)), #test, __LINE__, __FUNCTION__)
-
-    #define assertInRange(value, min, max) \
-        assertUnitParameters(((value) >= (min) && (value) <= (max)), #value " out of range", __LINE__, __FUNCTION__)
-
-    #define assertGreaterThan(value, threshold) \
-    assertUnitParameters((value) > (threshold), #value " is not greater than " #threshold, __LINE__, __FUNCTION__)
-
-
-    // Helper Function
-    bool isCloseEnough(double value, double test, double tolerance) const
+    void testDefaultConstructor()
     {
-        return std::abs(value - test) <= tolerance;
+        // Setup
+        Satellite sat;
+
+        // Verify
+        assertUnit(sat.getRadius() == 10.0 * 100000); // Adjusted for scaling
+        assertUnit(sat.getNumFragments() == 2); // Satellite fragments
+        assertUnit(sat.getExpired() == false);
+        assertUnit(sat.getHasBeenHit() == false);
     }
 
-    // default constructor
-    void defaultConstructor()
-    {  // Setup
-       // Exercise
-        Satellite s;
-        // Verify
-        assertEquals(s.velocity.dx, 0.0);
-        assertEquals(s.velocity.dy, 0.0);
-        assertEquals(s.pos.x, 0.0);
-        assertEquals(s.pos.y, 0.0);
-        assertEquals(s.angle.radians, 0.0);
-        assertEquals(s.angularVelocity, 0.0);
-        assertEquals(s.dead, false);
-        assertEquals(s.radius, 0.0);
-        assertEquals(s.age, 0);
-    }  // Teardown
+    void testBreakApart()
+    {
+        // Setup
+        DummySimulator sim("");  // Pass empty string for default
+        Satellite sat(Position(100, 100), Velocity(50, 50));
+        sat.numFragments = 3; // Set number of fragments
 
-// initially not moving but receive a kick in the northern direction
-    void constructor_stationaryNorth()
-    {  // Setup
-        Satellite sParent;
-        sParent.pos.x = 51200000.0;   // 4000 px
-        sParent.pos.y = 64000000.0;   // 5000 px
-        sParent.velocity.dx = 0.0;    // stationary
-        sParent.velocity.dy = 0.0;
-        Angle direction;
-        direction.setDegrees(0.0);  // Up = 0 degrees
         // Exercise
-        Satellite s(sParent, direction);
+        sat.breakApart(&sim);
+
         // Verify
-        assertEqualsTolerance(0.0, s.velocity.dx, 250.0);    // small deviation 250
-        assertEqualsTolerance(2000.0, s.velocity.dy, 1200.0); // 1,000 <= v <= 3,000
-        assertEqualsTolerance(51200000.0, s.pos.x, 51200.0); // 4x128000.0 51200.0
-        assertEqualsTolerance(64000000.0, s.pos.y, 51200.0); // 512000.0
-        assertEquals(s.angle.radians, 0.0);
-        assertEquals(s.angularVelocity, 0.0);
-        assertEquals(s.dead, false);
-        assertEquals(s.radius, 0.0);
-        assertEquals(s.age, 0);
+        assertUnit(sat.getExpired() == true);
+        assertUnit(sat.getHasBeenHit() == true);
     }
 
-    // initially not moving but receive a kick in the south direction
-    void constructor_stationarySouth()
-    {  // Setup
-        Satellite sParent;
-        sParent.pos.x = 51200000.0;   // 4000 px
-        sParent.pos.y = 64000000.0;   // 5000 px
-        sParent.velocity.dx = 0.0;     // stationary
-        sParent.velocity.dy = 0.0;
-        Angle direction;
-        direction.setDegrees(180.0);  // Down = 180 degrees
-        // Exercise
-        Satellite s(sParent, direction);
-        // Verify
-        assertEqualsTolerance(0.0, s.velocity.dx, 250.0);     // small deviation
-        assertEqualsTolerance(-2000.0, s.velocity.dy, 1200.0); // -3,000 <= v <= -1,000
-        assertEqualsTolerance(51200000.0, s.pos.x, 51200.0);
-        assertEqualsTolerance(64000000.0, s.pos.y, 51200.0);
-        assertEquals(s.angle.radians, 0.0);
-        assertEquals(s.angularVelocity, 0.0);
-        assertEquals(s.dead, false);
-        assertEquals(s.radius, 0.0);
-        assertEquals(s.age, 0);
+    void testCollisionBehavior()
+    {
+        // Setup - Create two satellites in collision course
+        Position pos1(0, 0);
+        Position pos2(15, 0);  // Close enough to collide based on radii
+        Velocity vel(0, 0);
+
+        Satellite sat1(pos1, vel);
+        Satellite sat2(pos2, vel);
+
+        // Test collision detection
+        assertUnit(sat1.isHit(&sat2));
+        assertUnit(sat2.isHit(&sat1));
+
+        // Test collision between different satellite types
+        GPS::GPS gps(pos1, vel);
+        Dragon::Dragon dragon(pos2, vel);
+
+        assertUnit(gps.isHit(&dragon));
+        assertUnit(dragon.isHit(&gps));
     }
 
-    // initially not moving but receive a kick in the east direction
-    void constructor_stationaryEast()
-    {  // Setup
-        Satellite sParent;
-        sParent.pos.x = 51200000.0;   // 4000 px
-        sParent.pos.y = 64000000.0;   // 5000 px
-        sParent.velocity.dx = 0.0;     // stationary
-        sParent.velocity.dy = 0.0;
-        Angle direction;
-        direction.setDegrees(90.0);   // West = 270 degrees
-        // Exercise
-        Satellite s(sParent, direction);
-        // Verify
-        assertEqualsTolerance(2000.0, s.velocity.dx, 1200.0); // 1,000 <= v <= 3,000
-        assertEqualsTolerance(0.0, s.velocity.dy, 250.0);    // small deviation
-        assertEqualsTolerance(51200000.0, s.pos.x, 51200.0); // 4x128000.0
-        assertEqualsTolerance(64000000.0, s.pos.y, 51200.0);
-        assertEquals(s.angle.radians, 0.0);
-        assertEquals(s.angularVelocity, 0.0);
-        assertEquals(s.dead, false);
-        assertEquals(s.radius, 0.0);
-        assertEquals(s.age, 0);
-    }  // Teardown
+    void testSatelliteInitialStates()
+    {
+        // Test GPS initial state
+        GPS::GPS gps;
+        assertUnit(gps.getRadius() == 7.0 * 100000);
+        assertUnit(gps.getNumFragments() == 2);
 
-    void constructor_stationaryWest()
-    {  // Setup
-        Satellite sParent;
-        sParent.pos.x = 51200000.0;   // 4000 px
-        sParent.pos.y = 64000000.0;   // 5000 px
-        sParent.velocity.dx = 0.0;     // stationary
-        sParent.velocity.dy = 0.0;
-        Angle direction;
-        direction.setDegrees(270.0);   // West = 270 degrees
-        // Exercise
-        Satellite s(sParent, direction);
-        // Verify
-        assertEqualsTolerance(-2000.0, s.velocity.dx, 1200.0); // -3,000 <= v <= -1,000
-        assertEqualsTolerance(0.0, s.velocity.dy, 250.0);      // small deviation
-        assertEqualsTolerance(51200000.0, s.pos.x, 51200.0);  // 4x128000.0
-        assertEqualsTolerance(64000000.0, s.pos.y, 51200.0);
-        assertEquals(s.angle.radians, 0.0);
-        assertEquals(s.angularVelocity, 0.0);
-        assertEquals(s.dead, false);
-        assertEquals(s.radius, 0.0);
-        assertEquals(s.age, 0);
+        // Test Dragon initial state
+        Dragon::Dragon dragon;
+        assertUnit(dragon.getRadius() == 7.0 * 100000);
+        assertUnit(dragon.getNumFragments() == 2);
+
+        // Test Starlink initial state
+        Starlink::Starlink starlink;
+        assertUnit(starlink.getRadius() == 7.0 * 100000);
+        assertUnit(starlink.getNumFragments() == 2);
+
+        // Test Hubble initial state
+        Hubble::Hubble hubble;
+        assertUnit(hubble.getRadius() == 7.0 * 100000);
+        assertUnit(hubble.getNumFragments() == 2);
     }
 
-    // Constructor tests for satellites receiving kicks
-    void constructor_upNorth()
-    {  // Setup
-        Satellite sParent;
-        sParent.pos.x = 512000000.0;       // 4000 px
-        sParent.pos.y = 640000000.0;       // 5000 px
-        sParent.velocity.dx = 0.0;
-        sParent.velocity.dy = 10000.0;     // moving up
-        Angle direction;
-        direction.setDegrees(0.0);   
-        // Exercise
-        Satellite s(sParent, direction);
-        // Verify
-        assertEqualsTolerance(0.0, s.velocity.dx, 250.0);         // small deviation
-        assertEqualsTolerance(12000.0, s.velocity.dy, 1200.0);    // 11,000 <= v <= 13,000
-        assertEqualsTolerance(512000000.0, s.pos.x, 512000.0);    // 4x128000.0
-        assertEqualsTolerance(640000000.0, s.pos.y, 512000.0);
-        assertEquals(s.angle.radians, 0.0);
-        assertEquals(s.angularVelocity, 0.0);
-        assertEquals(s.dead, false);
-        assertEquals(s.radius, 0.0);
-        assertEquals(s.age, 0);
+    void testSatelliteVelocityCollisions()
+    {
+        // Test collisions with different velocities
+        Position pos1(0, 0);
+        Position pos2(15, 0);
+
+        // Test head-on collision
+        Velocity vel1(50, 0);
+        Velocity vel2(-50, 0);
+        Satellite sat1(pos1, vel1);
+        Satellite sat2(pos2, vel2);
+        assertUnit(sat1.isHit(&sat2));
+
+        // Test perpendicular paths
+        Velocity vel3(0, 50);
+        Satellite sat3(pos1, vel1);
+        Satellite sat4(pos2, vel3);
+        assertUnit(sat3.isHit(&sat4));
+
+        // Test parallel paths
+        Velocity vel5(50, 0);
+        Velocity vel6(50, 0);
+        Satellite sat5(pos1, vel5);
+        Satellite sat6(pos2, vel6);
+        assertUnit(sat5.isHit(&sat6));
     }
 
-    void constructor_upEast()
-    {  // Setup
-        Satellite sParent;
-        sParent.pos.x = 512000000.0;       // 4000 px
-        sParent.pos.y = 640000000.0;       // 5000 px
-        sParent.velocity.dx = 0.0;
-        sParent.velocity.dy = 10000.0;     // moving up
-        Angle direction;
-        direction.setDegrees(90.0);
-        // Exercise
-        Satellite s(sParent, direction);
-        // Verify
-        assertEqualsTolerance(2000.0, s.velocity.dx, 1200.0);     // 1,000 <= v <= 3,000
-        assertEqualsTolerance(10000.0, s.velocity.dy, 250.0);     // small deviation
-        assertEqualsTolerance(512000000.0, s.pos.x, 512000.0);    // 4x128000.0
-        assertEqualsTolerance(640000000.0, s.pos.y, 512000.0);
-        assertEquals(s.angle.radians, 0.0);
-        assertEquals(s.angularVelocity, 0.0);
-        assertEquals(s.dead, false);
-        assertEquals(s.radius, 0.0);
-        assertEquals(s.age, 0);
+    void testSatelliteTypesCollisions()
+    {
+        Position pos1(0, 0);
+        Position pos2(15, 0);
+        Velocity vel(0, 0);
+
+        // Test GPS with all other types
+        GPS::GPS gps(pos1, vel);
+        Dragon::Dragon dragon(pos2, vel);
+        Starlink::Starlink starlink(pos2, vel);
+        Hubble::Hubble hubble(pos2, vel);
+        Sputnik sputnik(pos2, vel);
+
+        assertUnit(gps.isHit(&dragon));
+        assertUnit(gps.isHit(&starlink));
+        assertUnit(gps.isHit(&hubble));
+        assertUnit(gps.isHit(&sputnik));
+
+        // Test Dragon with all other types
+        Dragon::Dragon dragon2(pos1, vel);
+        assertUnit(dragon2.isHit(&starlink));
+        assertUnit(dragon2.isHit(&hubble));
+        assertUnit(dragon2.isHit(&sputnik));
+
+        // Test Starlink with remaining types
+        Starlink::Starlink starlink2(pos1, vel);
+        assertUnit(starlink2.isHit(&hubble));
+        assertUnit(starlink2.isHit(&sputnik));
     }
 
-    void constructor_rightNorth()
-    {  // Setup
-        Satellite sParent;
-        sParent.pos.x = 512000000.0;       // 4000 px
-        sParent.pos.y = 640000000.0;       // 5000 px
-        sParent.velocity.dx = 10000.0;     // moving right
-        sParent.velocity.dy = 0.0;
-        Angle direction;
-        direction.setDegrees(0.0);
-        // Exercise
-        Satellite s(sParent, direction);
-        // Verify
-        assertEqualsTolerance(10000.0, s.velocity.dx, 250.0);     // small kick
-        assertEqualsTolerance(2000.0, s.velocity.dy, 1200.0);     // 1,000 <= v <= 3,000
-        assertEqualsTolerance(512000000.0, s.pos.x, 512000.0);    // 4x128000.0
-        assertEqualsTolerance(640000000.0, s.pos.y, 512000.0);
-        assertEquals(s.angle.radians, 0.0);
-        assertEquals(s.angularVelocity, 0.0);
-        assertEquals(s.dead, false);
-        assertEquals(s.radius, 0.0);
-        assertEquals(s.age, 0);
+    void testBoundaryCollisions()
+    {
+        Position pos1(0, 0);
+        Velocity vel(0, 0);
+        Satellite sat1(pos1, vel);
+
+        // Test exact boundary collision
+        double exactDistance = (sat1.getRadius() + sat1.getRadius()) / 100000.0;
+        Position boundaryPos(exactDistance, 0);
+        Satellite sat2(boundaryPos, vel);
+        assertUnit(sat1.isHit(&sat2));
+
+        // Test just inside boundary
+        Position insidePos(exactDistance - 1, 0);
+        Satellite sat4(insidePos, vel);
+        assertUnit(sat1.isHit(&sat4));
     }
 
-    void move_stationaryNorth()
-    {  // Setup
-        Satellite s;
-        s.pos.x = 0.0;
-        s.pos.y = 6378000.0;       // radius of the earth
-        s.velocity.dx = 0.0;
-        s.velocity.dy = 0.0;
-        s.angle.radians = 1.234;
-        s.angularVelocity = 0.0;
-        s.dead = false;
-        s.radius = 0.0;
-        s.age = 100;
-        // Exercise
-        s.move(1.0);
-        // Verify
-        assertEqualsTolerance(0.0, s.velocity.dx, 0.01);           // no horizontal movement
-        assertEqualsTolerance(-9.806, s.velocity.dy, 0.01);        // should fall towards earth
-        assertEqualsTolerance(0.0, s.pos.x, 0.01);                 // no horizontal movement
-        assertEqualsTolerance(6378000.0 - 9.806, s.pos.y, 0.01);   // should fall towards earth
-        assertEquals(s.angle.radians, 1.234);                       // no rotation
-        assertEquals(s.age, 101);                                   // aged by 1 second
-        assertEquals(s.angularVelocity, 0.0);
-        assertEquals(s.dead, false);
-        assertEquals(s.radius, 0.0);
-    }
 
-    // Initially stationary and above the earth but with a spin
-    void move_stationaryNorthSpin()
-    {  // Setup
-        Satellite s;
-        s.pos.x = 0.0;
-        s.pos.y = 6378000.0;       // radius of the earth
-        s.velocity.dx = 0.0;
-        s.velocity.dy = 0.0;
-        s.angle.radians = 1.234;
-        s.angularVelocity = 0.5;    // huge rotation
-        s.dead = false;
-        s.radius = 0.0;
-        s.age = 100;
-        // Exercise
-        s.move(1.0);
-        // Verify
-        assertEqualsTolerance(0.0, s.velocity.dx, 0.01);           // no horizontal movement
-        assertEqualsTolerance(-9.806, s.velocity.dy, 0.01);        // should fall towards earth
-        assertEqualsTolerance(0.0, s.pos.x, 0.01);                 // no horizontal movement
-        assertEqualsTolerance(6378000.0 - 9.806, s.pos.y, 0.01);   // should fall towards earth
-        assertEquals(s.angle.radians, 1.734);                       // rotate by .5 radians
-        assertEquals(s.age, 101);                                   // aged by 1 second
-        assertEquals(s.angularVelocity, 0.5);
-        assertEquals(s.dead, false);
-        assertEquals(s.radius, 0.0);
-    }
-
-    // Initially stationary and to the right of the earth
-    void move_stationaryEast()
-    {  // Setup
-        Satellite s;
-        s.pos.x = 6378000.0;       // radius of the earth
-        s.pos.y = 0.0;
-        s.velocity.dx = 0.0;
-        s.velocity.dy = 0.0;
-        s.angle.radians = 1.234;
-        s.angularVelocity = 0.0;
-        s.dead = false;
-        s.radius = 0.0;
-        s.age = 100;
-        // Exercise
-        s.move(1.0);
-        // Verify
-        assertEqualsTolerance(-9.806, s.velocity.dx, 0.01);        // should fall towards earth
-        assertEqualsTolerance(0.0, s.velocity.dy, 0.01);           // no vertical movement
-        assertEqualsTolerance(6378000.0 - 9.806, s.pos.x, 0.01);   // should fall towards earth
-        assertEqualsTolerance(0.0, s.pos.y, 0.01);                 // no vertical movement
-        assertEquals(s.angle.radians, 1.234);                       // no rotation
-        assertEquals(s.age, 101);                                   // aged by 1 second
-    }
-
-    // Moving up (north) when to the north (above) the earth
-    void move_upNorth()
-    {  // Setup
-        Satellite s;
-        s.pos.x = 0.0;
-        s.pos.y = 6378000.0;       // to the north radius of the earth
-        s.velocity.dx = 0.0;
-        s.velocity.dy = 100.0;      // moving up
-        s.angle.radians = 1.234;
-        s.angularVelocity = 0.0;
-        s.dead = false;
-        s.radius = 0.0;
-        s.age = 100;
-        // Exercise
-        s.move(1.0);
-        // Verify
-        assertEqualsTolerance(0.0, s.velocity.dx, 0.01);                      // no horizontal movement
-        assertEqualsTolerance(100.0 - 9.806, s.velocity.dy, 0.01);           // should slow down due to gravity
-        assertEqualsTolerance(0.0, s.pos.x, 0.01);                           // no horizontal movement
-        assertEqualsTolerance(6378000.00 + 100.0 - 9.806, s.pos.y, 0.01);   // should move up less due to gravity
-        assertEquals(s.angle.radians, 1.234);                                 // no rotation
-        assertEquals(s.age, 101);                                             // aged by 1 second
-        assertEquals(s.angularVelocity, 0.0);
-        assertEquals(s.dead, false);
-        assertEquals(s.radius, 0.0);
-    }
-
-    // Moving up (north) when to the east (right) the earth
-    void move_upEast()
-    {  // Setup
-        Satellite s;
-        s.pos.x = 6378000.00;      // to the east radius of the earth
-        s.pos.y = 0.0;
-        s.velocity.dx = 0.0;
-        s.velocity.dy = 100.0;      // moving up
-        s.angle.radians = 1.234;
-        s.angularVelocity = 0.0;
-        s.dead = false;
-        s.radius = 0.0;
-        s.age = 100;
-        // Exercise
-        s.move(1.0);
-        // Verify
-        assertEqualsTolerance(-9.806, s.velocity.dx, 0.01);        // should fall towards earth
-        assertEqualsTolerance(100.0, s.velocity.dy, 0.01);         // move vertically due to thrust
-        assertEqualsTolerance(6378000.0 - 9.806, s.pos.x, 0.01);   // fell a tiny bit due to gravity
-        assertEqualsTolerance(100.0, s.pos.y, 0.01);               // moved quite a bit due to thrust
-        assertEquals(s.angle.radians, 1.234);                       // no rotation
-        assertEquals(s.age, 101);                                   // aged by 1 second
-        assertEquals(s.angularVelocity, 0.0);
-        assertEquals(s.dead, false);
-        assertEquals(s.radius, 0.0);
-    }
-
-    void move_rightNorth()
-    {  // Setup
-        Satellite s;
-        s.pos.x = 0.0;
-        s.pos.y = 6378000.0;       // to the north radius of the earth
-        s.velocity.dx = 100.0;      // moving to the east
-        s.velocity.dy = 0.0;
-        s.angle.radians = 1.234;
-        s.angularVelocity = 0.0;
-        s.dead = false;
-        s.radius = 0.0;
-        s.age = 100;
-        // Exercise
-        s.move(1.0);
-        // Verify
-        assertEqualsTolerance(100.0, s.velocity.dx, 0.01);         // move horizontally
-        assertEqualsTolerance(-9.806, s.velocity.dy, 0.01);        // should fall towards earth
-        assertEqualsTolerance(100.0, s.pos.x, 0.01);              // moved quite a bit horizontally
-        assertEqualsTolerance(6378000.0 - 9.806, s.pos.y, 0.01);  // fell a tiny bit due to gravity
-        assertEquals(s.angle.radians, 1.234);                      // no rotation
-        assertEquals(s.age, 101);                                  // aged by 1 second
-        assertEquals(s.angularVelocity, 0.0);
-        assertEquals(s.dead, false);
-        assertEquals(s.radius, 0.0);
-    }
 };
 
+#endif /* testSatellite_h */

@@ -1,71 +1,23 @@
+
+
+/***********************************************************************
+ * Header File:
+ *    Sputnik
+ * Author:
+ *    Chris Mijangos and Seth Chen
+ * Summary:
+ *    Everything we need to know about Sputnik 
+ ************************************************************************/
 #pragma once
 #include "satellite.h"
-#include "velocity.h"
-#include "uiDraw.h"
-#include "Fragment.h"
 
-class TestSputnik;
-
-/*********************************************
- * SPUTNIK
- * The first artificial satellite in space
- *********************************************/
 class Sputnik : public Satellite
 {
 public:
-    friend TestSputnik;
-    Sputnik() : Satellite(0, 4.0, 0.001)  // age=0, radius=4.0, angularVelocity=0.1
-    {
-        // Initial position and velocity for retrograde orbit
-        pos.setMetersX(-36515095.13);
-        pos.setMetersY(21082000.0);
+	friend class TestSputnik;
+	Sputnik(Position pos = Position(), Velocity vel = Velocity(), Angle angle = Angle());
+	//   void breakApart(Simulator* sim, vector<CelestialObject*> subParts = {});
+	void draw() { ogs.drawSputnik(pos, rotationAngle.getDegree()); }
 
-        velocity.setDX(2050.0);  // m/s
-        velocity.setDY(2684.68); // m/s
-
-        timeDilation = 48.0; // Slowed down from 1440 for better visualization
-    }
-
-    virtual void move(double time) override
-    {
-        // Scale time by dilation factor for orbital motion
-        Satellite::move(time * timeDilation);
-
-        // Reset angle change to remove time dilation effect on rotation
-        angle.add(-angularVelocity * (timeDilation - 1.0));  // Counteract the extra rotation
-    }
-
-
-    // Draw the Sputnik satellite
-    virtual void draw(ogstream& gout) override
-    {
-        if (!isInvisible() && !isDead())
-            gout.drawSputnik(pos, angle.getRadians());
-    }
-
-    // Draw the Sputnik satellite
-    virtual void destroy(std::list<Satellite*>& satellites) override
-    {
-        if (!isInvisible() && !isDead())
-        {
-            // Sputnik breaks into 4 fragments
-            for (int i = 0; i < 4; i++)
-            {
-                Angle angle;
-                angle.setDegrees(random(0.0, 360.0));
-                satellites.push_back(new Fragment(*this, angle));
-            }
-            kill();
-        }
-    }
-
-
-private:
-    double timeDilation;  // Time scaling factor for this satellite
 };
-
-
-
-
-
 

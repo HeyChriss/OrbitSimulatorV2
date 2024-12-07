@@ -1,38 +1,54 @@
+/***********************************************************************
+ * Header File:
+ *    test
+ * Author:
+ *    Chris Mijangos and Seth Chen
+ * Summary:
+ *    Everything we need to know about test
+ ************************************************************************/
+
 #include "test.h"
 #include "testPosition.h"
-#include "testVelocity.h"
-#include "testAcceleration.h"
-#include "testAngle.h"
-#include "testSatellite.h"
-#include "testSputnik.h"
+#include "testPhysics.h"
 #include "testHubble.h"
-#include "TestStarlink.h"
-#include "TestCrewDragon.h"
+#include "testShip.h"
+#include "testAcceleration.h"
+#include "TestDirection.h"
+#include "TestVelocity.h"
+#include "TestCelestialObject.h"
+#include "TestSatellite.h"
+#include "TestObject.h"
+#include "TestDragon.h"
 #include "TestGPS.h"
-#include "TestShip.h"
-#include "TestPart.h"
-#include "TestFragment.h"
+#include "TestSputnik.h"
+#include "TestStarlink.h"
 #include "TestProjectile.h"
+#include "TestFragment.h"
+#include "TestPart.h"
 
-/*****************************************************************
- * TEST RUNNER
- * Runs all the unit tests
- ****************************************************************/
+ /*****************************************************************
+  * TEST RUNNER
+  * Runs all the unit tests
+  ****************************************************************/
 void testRunner()
 {
 	TestPosition().run();
 	TestVelocity().run();
-	TestAcceleration().run();
 	TestAngle().run();
+	TestPhysics().run();
+	TestAcceleration().run();
+	TestDirection().run();
+	TestCelestialObject().run();
+	TestObject().run();
 	TestSatellite().run();
-	TestSputnik().run();
 	TestHubble().run();
-	TestStarlink().run();
-	TestCrewDragon().run();
+	TestDragon().run();
 	TestGPS().run();
+	TestSputnik().run();
+	TestStarlink().run();
 	TestShip().run();
-	TestPart().run();
-	TestFragment().run();
 	TestProjectile().run();
+	TestFragment().run();
+	TestPart().run();
 
 }

@@ -37,9 +37,6 @@
 
 #include "position.h"
 #include "uiDraw.h"
-#include <iostream>
-
-
 
 using namespace std;
 
@@ -58,7 +55,7 @@ const int RGB_GREEN[] = { 0, 150,   0 };
 /************************************************************************
  * ROTATE
  * Rotate a given point (point) around a given origin (center) by a given
- * number of degrees (angle).
+ * number of degrees (direction).
  *    INPUT  origin   The center point we will rotate around
  *           x,y      Offset from center that we will be rotating, in pixels
  *           rotation Rotation in degrees
@@ -227,7 +224,7 @@ void ogstream::drawProjectile(const Position& pt)
  * DRAW FRAGMENT
  * Draw a fragment on the screen.
  *   INPUT  center    The location of the fragment
- *          rotation  Which angle it is pointed
+ *          rotation  Which direction it is pointed
  *************************************************************************/
 void ogstream::drawFragment(const Position& center, double rotation)
 {
@@ -938,39 +935,39 @@ void ogstreamDummy::drawStar(const Position& point, unsigned char phase) { asser
 /******************************************************************
  * FAKE
  ****************************************************************/
- // void ogstreamFake::flush() { assert(false); }
- // void ogstreamFake::setPosition(const Position& pt) { assert(false); }
- // ogstreamFake& ogstreamFake::operator = (const Position& pt) { assert(false); return *this; }
- // void ogstreamFake::drawFragment(const Position& center, double rotation) { *this << "Fragment" << center << rotation << "\n"; }
- // void ogstreamFake::drawProjectile(const Position& center) { *this << "Projectile" << center << "\n"; }
- // void ogstreamFake::drawCrewDragon(const Position& center, double rotation) { *this << "CrewDragon" << center << rotation << "\n"; }
- // void ogstreamFake::drawCrewDragonRight(const Position& center, double rotation, const Position& offset) { *this << "CrewDragonRight" << center << rotation << "\n"; }
- // void ogstreamFake::drawCrewDragonLeft(const Position& center, double rotation, const Position& offset) { *this << "CrewDragonLeft " << center << rotation << "\n"; }
- // void ogstreamFake::drawCrewDragonCenter(const Position& center, double rotation) { *this << "CrewDragonCenter" << center << rotation << "\n"; }
- // void ogstreamFake::drawSputnik(const Position& center, double rotation) { *this << "Sputnik" << center << rotation << "\n"; }
- // void ogstreamFake::drawGPS(const Position& center, double rotation) { *this << "GPS" << center << rotation << "\n"; }
- // void ogstreamFake::drawGPSCenter(const Position& center, double rotation) { *this << "GPSCenter" << center << rotation << "\n"; }
- // void ogstreamFake::drawGPSRight(const Position& center, double rotation, const Position& offset) { *this << "GPSRight" << center << rotation << "\n"; }
- // void ogstreamFake::drawGPSLeft(const Position& center, double rotation, const Position& offset) { *this << "GPSLeft" << center << rotation << "\n"; }
- // void ogstreamFake::drawHubble(const Position& center, double rotation) { *this << "Hubble" << center << rotation << "\n"; }
- // void ogstreamFake::drawHubbleComputer(const Position& center, double rotation, const Position& offset) { *this << "HubbleComputer" << center << rotation << "\n"; }
- // void ogstreamFake::drawHubbleTelescope(const Position& center, double rotation, const Position& offset) { *this << "HubbleTelescope" << center << rotation << "\n"; }
- // void ogstreamFake::drawHubbleLeft(const Position& center, double rotation, const Position& offset) { *this << "HubbleLeft" << center << rotation << "\n"; }
- // void ogstreamFake::drawHubbleRight(const Position& center, double rotation, const Position& offset) { *this << "HubbleRight" << center << rotation << "\n"; }
- // void ogstreamFake::drawStarlink(const Position& center, double rotation) { *this << "Starlink" << center << rotation << "\n"; }
- // void ogstreamFake::drawStarlinkBody(const Position& center, double rotation, const Position& offset) { *this << "StarlinkBody" << center << rotation << "\n"; }
- // void ogstreamFake::drawStarlinkArray(const Position& center, double rotation, const Position& offset) { *this << "StarlinkArray" << center << rotation << "\n"; }
- // void ogstreamFake::drawShip(const Position& center, double rotation, bool thrust) { *this << "Ship" << center << rotation << "\n"; }
- // void ogstreamFake::drawEarth(const Position& center, double rotation) { *this << "Earth" << center << rotation << "\n"; }
- // void ogstreamFake::drawStar(const Position& center, unsigned char phase) { *this << "Star" << center << phase << "\n"; }
+void ogstreamFake::flush() { assert(false); }
+void ogstreamFake::setPosition(const Position& pt) { assert(false); }
+ogstreamFake& ogstreamFake::operator = (const Position& pt) { assert(false); return *this; }
+void ogstreamFake::drawFragment(const Position& center, double rotation) { *this << "Fragment" << center << rotation << "\n"; }
+void ogstreamFake::drawProjectile(const Position& center) { *this << "Projectile" << center << "\n"; }
+void ogstreamFake::drawCrewDragon(const Position& center, double rotation) { *this << "CrewDragon" << center << rotation << "\n"; }
+void ogstreamFake::drawCrewDragonRight(const Position& center, double rotation, const Position& offset) { *this << "CrewDragonRight" << center << rotation << "\n"; }
+void ogstreamFake::drawCrewDragonLeft(const Position& center, double rotation, const Position& offset) { *this << "CrewDragonLeft " << center << rotation << "\n"; }
+void ogstreamFake::drawCrewDragonCenter(const Position& center, double rotation) { *this << "CrewDragonCenter" << center << rotation << "\n"; }
+void ogstreamFake::drawSputnik(const Position& center, double rotation) { *this << "Sputnik" << center << rotation << "\n"; }
+void ogstreamFake::drawGPS(const Position& center, double rotation) { *this << "GPS" << center << rotation << "\n"; }
+void ogstreamFake::drawGPSCenter(const Position& center, double rotation) { *this << "GPSCenter" << center << rotation << "\n"; }
+void ogstreamFake::drawGPSRight(const Position& center, double rotation, const Position& offset) { *this << "GPSRight" << center << rotation << "\n"; }
+void ogstreamFake::drawGPSLeft(const Position& center, double rotation, const Position& offset) { *this << "GPSLeft" << center << rotation << "\n"; }
+void ogstreamFake::drawHubble(const Position& center, double rotation) { *this << "Hubble" << center << rotation << "\n"; }
+void ogstreamFake::drawHubbleComputer(const Position& center, double rotation, const Position& offset) { *this << "HubbleComputer" << center << rotation << "\n"; }
+void ogstreamFake::drawHubbleTelescope(const Position& center, double rotation, const Position& offset) { *this << "HubbleTelescope" << center << rotation << "\n"; }
+void ogstreamFake::drawHubbleLeft(const Position& center, double rotation, const Position& offset) { *this << "HubbleLeft" << center << rotation << "\n"; }
+void ogstreamFake::drawHubbleRight(const Position& center, double rotation, const Position& offset) { *this << "HubbleRight" << center << rotation << "\n"; }
+void ogstreamFake::drawStarlink(const Position& center, double rotation) { *this << "Starlink" << center << rotation << "\n"; }
+void ogstreamFake::drawStarlinkBody(const Position& center, double rotation, const Position& offset) { *this << "StarlinkBody" << center << rotation << "\n"; }
+void ogstreamFake::drawStarlinkArray(const Position& center, double rotation, const Position& offset) { *this << "StarlinkArray" << center << rotation << "\n"; }
+void ogstreamFake::drawShip(const Position& center, double rotation, bool thrust) { *this << "Ship" << center << rotation << "\n"; }
+void ogstreamFake::drawEarth(const Position& center, double rotation) { *this << "Earth" << center << rotation << "\n"; }
+void ogstreamFake::drawStar(const Position& center, unsigned char phase) { *this << "Star" << center << phase << "\n"; }
 
- /******************************************************************
-  * RANDOM
-  * This function generates a random number.
-  *
-  *    INPUT:   min, max : The number of values (min <= num <= max)
-  *    OUTPUT   <return> : Return the integer
-  ****************************************************************/
+/******************************************************************
+ * RANDOM
+ * This function generates a random number.
+ *
+ *    INPUT:   min, max : The number of values (min <= num <= max)
+ *    OUTPUT   <return> : Return the integer
+ ****************************************************************/
 int random(int min, int max)
 {
     assert(min < max);
@@ -996,3 +993,9 @@ double random(double min, double max)
 
     return num;
 }
+
+
+
+
+
+

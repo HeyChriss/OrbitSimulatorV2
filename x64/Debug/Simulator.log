@@ -1,2 +1,8 @@
-﻿  Simulator.cpp
+﻿  velocity.cpp
+C:\Users\USUARIO\Desktop\v2\velocity.h(48,56): warning C4244: '=': conversión de 'double' a 'float'; posible pérdida de datos
+C:\Users\USUARIO\Desktop\v2\velocity.h(48,70): warning C4244: '=': conversión de 'double' a 'float'; posible pérdida de datos
+C:\Users\USUARIO\Desktop\v2\velocity.h(49,41): warning C4244: '=': conversión de 'double' a 'float'; posible pérdida de datos
+C:\Users\USUARIO\Desktop\v2\velocity.h(50,41): warning C4244: '=': conversión de 'double' a 'float'; posible pérdida de datos
+C:\Users\USUARIO\Desktop\v2\velocity.h(51,49): warning C4244: '=': conversión de 'double' a 'float'; posible pérdida de datos
+C:\Users\USUARIO\Desktop\v2\velocity.h(52,49): warning C4244: '=': conversión de 'double' a 'float'; posible pérdida de datos
   Simulator.vcxproj -> C:\Users\USUARIO\Desktop\v2\x64\Debug\Simulator.exe
