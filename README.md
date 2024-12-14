@@ -4,7 +4,7 @@ A C++ simulation of orbital mechanics featuring various satellites and space obj
 
 ## Overview
 
-This simulator models the behavior of various satellites and spacecraft in Earth's orbit. It includes realistic physics calculations for orbital mechanics, collision detection, and object fragmentation.
+This simulator models the behavior of various satellites and spacecraft in Earth's orbit. It includes realistic physics calculations for orbital mechanics, collision detection, and object fragmentation. Link for video demo https://cdnapisec.kaltura.com/index.php/extwidget/preview/partner_id/1157612/uiconf_id/42438192/entry_id/1_pudlgkbb/embed/dynamic
 
 ## Features
 
