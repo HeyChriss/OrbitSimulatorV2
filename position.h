@@ -24,6 +24,17 @@ class Position
 {
 public:
     friend TestPosition;
+    friend class TestHubble;
+    friend class TestDragon;
+    friend class TestGPS;
+    friend class TestShip;
+    friend class TestSputnik;
+    friend class TestStarlink;
+    friend class TestCelestialObject;
+    friend class TestSatellite;
+    friend class TestProjectile;
+    friend class TestFragment;
+    friend class TestPart;
 
     Position() : x(0.0), y(0.0) {}
     Position(double x, double y);

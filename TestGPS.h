@@ -15,72 +15,165 @@
 #include "unitTest.h"
 #include "simulator.h"
 
-/*******************************
- * TEST GPS
- * A friend class for GPS which contains the GPS unit tests
- ********************************/
+ /*******************************
+  * TEST GPS
+  * A friend class for GPS which contains the GPS unit tests
+  ********************************/
 class TestGPS : public UnitTest
 {
 public:
     void run()
     {
-        testConstructor();
-        testBreakApart();
-        testGPSParts();
+        testGPSConstructorRadius();
+        testGPSConstructorFragments();
+        testGPSConstructorExpired();
+        testGPSConstructorHasBeenHit();
+        testGPSBreakApart();
+        testGPSCenterRadius();
+        testGPSCenterFragments();
+        testGPSCenterOrigin();
+        testGPSLeftRadius();
+        testGPSLeftFragments();
+        testGPSLeftOrigin();
+        testGPSRightRadius();
+        testGPSRightFragments();
+        testGPSRightOrigin();
 
         report("GPS");
     }
 
 private:
-    void testConstructor()
+    void testGPSConstructorRadius()
     {
         // Setup & Exercise
         GPS::GPS gps;
 
-        // Verify initial state
-        assertUnit(gps.getRadius() == 700000.0);  // 7 * 100000
-        assertUnit(gps.getNumFragments() == 2);
-        assertUnit(!gps.getExpired());
-        assertUnit(!gps.getHasBeenHit());
+        // Verify - direct member access
+        assertUnit(gps.radius == 7);
     }
 
-    void testBreakApart()
+    void testGPSConstructorFragments()
+    {
+        // Setup & Exercise
+        GPS::GPS gps;
+
+        // Verify - direct member access
+        assertUnit(gps.numFragments == 2);
+    }
+
+    void testGPSConstructorExpired()
+    {
+        // Setup & Exercise
+        GPS::GPS gps;
+
+        // Verify - direct member access
+        assertUnit(gps.isExpired == false);
+    }
+
+    void testGPSConstructorHasBeenHit()
+    {
+        // Setup & Exercise
+        GPS::GPS gps;
+
+        // Verify - direct member access
+        assertUnit(gps.hasBeenHit == false);
+    }
+
+    void testGPSBreakApart()
     {
         // Setup
-        Position pos(100, 100);
-        Velocity vel(50, 50);
-        DummySimulator* sim = new DummySimulator("GPS");  // Specify GPS type
-        GPS::GPS* gps = new GPS::GPS(pos, vel);
-        sim->addObject(gps);  // Add GPS to simulator
+        DummySimulator sim("GPS");
+        GPS::GPS gps;
+        gps.pos.x = 100;
+        gps.pos.y = 100;
+        gps.vel.dx = 50;
+        gps.vel.dy = 50;
 
         // Exercise
-        gps->breakApart(sim);
+        gps.breakApart(&sim);
 
-        // Verify
-        assertUnit(gps->getExpired() == true);
-
-        // Cleanup
-        delete sim;
+        // Verify - direct member access
+        assertUnit(gps.isExpired == true);
     }
 
-    void testGPSParts()
+    void testGPSCenterRadius()
     {
-        // Test GPSCenter 
+        // Setup & Exercise
         GPS::GPSCenter center;
-        assertUnit(center.getRadius() == 700000.0);  // 7 * 100000
-        assertUnit(center.getNumFragments() == 3);
+
+        // Verify - direct member access
+        assertUnit(center.radius == 7);
+    }
+
+    void testGPSCenterFragments()
+    {
+        // Setup & Exercise
+        GPS::GPSCenter center;
+
+        // Verify - direct member access
+        assertUnit(center.numFragments == 3);
+    }
+
+    void testGPSCenterOrigin()
+    {
+        // Setup & Exercise
+        GPS::GPSCenter center;
+
+        // Verify - direct member access
         assertUnit(center.partOrigin == "GPS");
+    }
 
-        // Test GPSLeft
+    void testGPSLeftRadius()
+    {
+        // Setup & Exercise
         GPS::GPSLeft left;
-        assertUnit(left.getRadius() == 800000.0);    // 8 * 100000
-        assertUnit(left.getNumFragments() == 3);
-        assertUnit(left.partOrigin == "GPS");
 
-        // Test GPSRight
+        // Verify - direct member access
+        assertUnit(left.radius == 8);
+    }
+
+    void testGPSLeftFragments()
+    {
+        // Setup & Exercise
+        GPS::GPSLeft left;
+
+        // Verify - direct member access
+        assertUnit(left.numFragments == 3);
+    }
+
+    void testGPSLeftOrigin()
+    {
+        // Setup & Exercise
+        GPS::GPSLeft left;
+
+        // Verify - direct member access
+        assertUnit(left.partOrigin == "GPS");
+    }
+
+    void testGPSRightRadius()
+    {
+        // Setup & Exercise
         GPS::GPSRight right;
-        assertUnit(right.getRadius() == 800000.0);   // 8 * 100000
-        assertUnit(right.getNumFragments() == 3);
+
+        // Verify - direct member access
+        assertUnit(right.radius == 8);
+    }
+
+    void testGPSRightFragments()
+    {
+        // Setup & Exercise
+        GPS::GPSRight right;
+
+        // Verify - direct member access
+        assertUnit(right.numFragments == 3);
+    }
+
+    void testGPSRightOrigin()
+    {
+        // Setup & Exercise
+        GPS::GPSRight right;
+
+        // Verify - direct member access
         assertUnit(right.partOrigin == "GPS");
     }
 };

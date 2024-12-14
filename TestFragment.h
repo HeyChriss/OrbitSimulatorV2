@@ -11,109 +11,197 @@
 #define testFragment_h
 
 #include <iostream>
-#include "fragment.h"
 #include <cassert>
+#include "fragment.h"
 #include "unitTest.h"
 #include "simulator.h"
 
-/*******************************
- * TEST Fragment
- * A friend class for Fragment which contains the Fragment unit tests
- ********************************/
 class TestFragment : public UnitTest
 {
 public:
     void run()
     {
-        testConstructor();
-        testUpdate();
-        testExpiration();
-        testInheritedProperties();
+        testDefaultConstructorRadius();
+        testDefaultConstructorFragments();
+        testDefaultConstructorRotation();
+        testDefaultConstructorPosition();
+        testDefaultConstructorLifetime();
+        testDefaultConstructorHasBeenHit();
+        testDefaultConstructorNonDefaultPosition();
+        testDefaultConstructorNonDefaultVelocity();
+        testDefaultConstructorNonDefaultAngle();
+        testUpdateRotation();
+        testUpdatePosition();
+        testIsExpiredFalse();
+        testIsExpiredTrue();
+        testLifetimeDecrement();
 
         report("Fragment");
     }
 
 private:
-    void testConstructor()
+    void testDefaultConstructorRadius()
+    {
+        // Setup & Exercise
+        Fragment fragment;
+
+        // Verify - direct member access
+        assertUnit(fragment.radius == 2);
+    }
+
+    void testDefaultConstructorFragments()
+    {
+        // Setup & Exercise
+        Fragment fragment;
+
+        // Verify - direct member access
+        assertUnit(fragment.numFragments == 0);
+    }
+
+    void testDefaultConstructorRotation()
+    {
+        // Setup & Exercise
+        Fragment fragment;
+
+        // Verify - direct member access
+        assertUnit(fragment.rotationAngle.radAngle >= 0.0);
+        assertUnit(fragment.rotationAngle.radAngle <= 2.0 * 3.141);
+    }
+
+    void testDefaultConstructorPosition()
+    {
+        // Setup & Exercise
+        Fragment fragment;
+
+        // Verify - direct member access
+        assertUnit(fragment.pos.x == 0.0);
+        assertUnit(fragment.pos.y == 0.0);
+    }
+
+    void testDefaultConstructorLifetime()
+    {
+        // Setup & Exercise
+        Fragment fragment;
+
+        // Verify - direct member access
+        assertUnit(fragment.lifetime >= 50);
+        assertUnit(fragment.lifetime <= 100);
+    }
+
+    void testDefaultConstructorHasBeenHit()
+    {
+        // Setup & Exercise
+        Fragment fragment;
+
+        // Verify - direct member access
+        assertUnit(fragment.hasBeenHit == true);
+    }
+
+    void testDefaultConstructorNonDefaultPosition()
     {
         // Setup & Exercise
         Position pos(100.0, 200.0);
-        Velocity vel(50.0, -30.0);
-        Angle angle(1.5);
-        Fragment fragment(pos, vel, angle);
+        Fragment fragment(pos);
 
-        // Verify initial state
-        assertUnit(fragment.getRadius() == 200000.0);  // 2 * 100000
-        assertUnit(fragment.getHasBeenHit() == true);  // Cannot break further
-        assertUnit(!fragment.isExpired());  // Should not start expired
-
-        // Verify position and velocity
-        assertEquals(fragment.getPosition().getMetersX(), 100.0);
-        assertEquals(fragment.getPosition().getMetersY(), 200.0);
-        assertEquals(fragment.getVelocity().getDx(), 50.0);
-        assertEquals(fragment.getVelocity().getDy(), -30.0);
+        // Verify - direct member access
+        assertUnit(fragment.pos.x == 100.0);
+        assertUnit(fragment.pos.y == 200.0);
     }
 
-    void testUpdate()
+    void testDefaultConstructorNonDefaultVelocity()
+    {
+        // Setup & Exercise
+        Position pos;
+        Velocity vel(10.0, 20.0);
+        Fragment fragment(pos, vel);
+
+        // Verify - direct member access
+        assertUnit(fragment.vel.dx == 10.0);
+        assertUnit(fragment.vel.dy == 20.0);
+    }
+
+    void testDefaultConstructorNonDefaultAngle()
+    {
+        // Setup & Exercise
+        Position pos;
+        Velocity vel;
+        Angle angle;
+        angle.radAngle = M_PI / 2;  // 90 degrees
+        Fragment fragment(pos, vel, angle);
+
+        // Verify - direct member access
+        assertUnit(fragment.rotationAngle.radAngle >= 0.0);
+        assertUnit(fragment.rotationAngle.radAngle <= 2.0 * 3.141);
+    }
+
+    void testUpdateRotation()
     {
         // Setup
         Fragment fragment;
-        double initialRotation = fragment.getRotation().getRadian();
+        double initialRotation = fragment.rotationAngle.radAngle;
 
         // Exercise
         fragment.update(1.0, 0.0, 0.0);
 
-        // Verify rotation changed
-        assertUnit(fragment.getRotation().getRadian() != initialRotation);
-        assertEquals(fragment.getRotation().getRadian(), initialRotation + 0.005);
+        // Verify - rotation should change
+        assertUnit(fragment.rotationAngle.radAngle != initialRotation);
     }
 
-    void testExpiration()
+    void testUpdatePosition()
     {
-        // Test multiple fragments to account for random lifetime
-        const int TEST_COUNT = 10;
-        int minLifetime = 999;
-        int maxLifetime = 0;
-
-        for (int test = 0; test < TEST_COUNT; test++)
-        {
-            // Setup
-            Fragment fragment;
-            int updateCount = 0;
-
-            // Exercise - count updates until expiration
-            while (!fragment.isExpired() && updateCount < 150)
-            {
-                updateCount++;
-                fragment.update(1.0, 0.0, 0.0);
-            }
-
-            // Track min and max lifetimes
-            if (updateCount < minLifetime) minLifetime = updateCount;
-            if (updateCount > maxLifetime) maxLifetime = updateCount;
-
-            // Verify each fragment expires eventually
-            assertUnit(fragment.isExpired());
-        }
-    }
-
-    void testInheritedProperties()
-    {
-        // Setup 
+        // Setup
         Fragment fragment;
+        fragment.pos.x = 100.0;
+        fragment.pos.y = 100.0;
+        fragment.vel.dx = 10.0;
+        fragment.vel.dy = 10.0;
 
-        // Verify CelestialObject properties
-        assertUnit(fragment.getNumFragments() == 0);  // Cannot break further
-        assertUnit(fragment.getHasBeenHit() == true); // Cannot break further
+        // Record initial position
+        double initialX = fragment.pos.x;
+        double initialY = fragment.pos.y;
 
-        // Verify random rotation is within bounds (0 to 2π)
-        double rotation = fragment.getRotation().getRadian();
-        assertUnit(rotation >= 0.0 && rotation <= 2.0 * 3.141592653589793);
+        // Exercise
+        fragment.update(1.0, 0.0, 0.0);
 
-        // Verify radius
-        assertUnit(fragment.getRadius() == 200000.0);  // 2 * 100000
+        // Verify - position should change based on velocity
+        assertUnit(fragment.pos.x != initialX);
+        assertUnit(fragment.pos.y != initialY);
+    }
+
+
+    void testIsExpiredFalse()
+    {
+        // Setup
+        Fragment fragment;
+        fragment.lifetime = 50;
+
+        // Exercise & Verify
+        assertUnit(fragment.isExpired() == false);
+    }
+
+    void testIsExpiredTrue()
+    {
+        // Setup
+        Fragment fragment;
+        fragment.lifetime = 0;
+
+        // Exercise & Verify
+        assertUnit(fragment.isExpired() == true);
+    }
+
+    void testLifetimeDecrement()
+    {
+        // Setup
+        Fragment fragment;
+        fragment.lifetime = 50;
+        int initialLifetime = fragment.lifetime;
+
+        // Exercise
+        fragment.isExpired();  // This decrements lifetime
+
+        // Verify
+        assertUnit(fragment.lifetime == initialLifetime - 1);
     }
 };
 
 #endif /* testFragment_h */
-

@@ -17,6 +17,7 @@ namespace Hubble {
         double offset = 10000;
 
         this->setExpired(true);
+        this->setHasBeenHit(true);
         sim->addObject(new HubbleLeft(Position(x + offset, y + offset), randomVelocity(this->getVelocity())));
         sim->addObject(new HubbleComputer(Position(x, y), randomVelocity(this->getVelocity())));
         sim->addObject(new HubbleRight(Position(x - offset, y - offset), randomVelocity(this->getVelocity())));

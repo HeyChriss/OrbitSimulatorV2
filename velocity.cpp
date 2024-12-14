@@ -2,9 +2,7 @@
 #include "angle.h"
 #include <cmath>
 
-#include <cmath>
-
-const double M_PI = std::acos(-1.0);
+constexpr double M_PI = 3.141592653589793;
 
 
 Velocity::Velocity()
@@ -13,33 +11,33 @@ Velocity::Velocity()
 	dy = 0;
 }
 
-Velocity::Velocity(float dx, float dy)
+Velocity::Velocity(double dx, double dy)
 {
 	this->dx = dx;
 	this->dy = dy;
 }
 
-float Velocity::getDx()
+double Velocity::getDx()
 {
 	return dx;
 }
 
-float Velocity::getDy()
+double Velocity::getDy()
 {
 	return dy;
 }
 
-float Velocity::getSpeed() const
+double Velocity::getSpeed() const
 {
 	return sqrt((dx * dx) + (dy * dy));
 }
 
-void Velocity::setDx(float dx)
+void Velocity::setDx(double dx)
 {
 	this->dx = dx;
 }
 
-void Velocity::setDy(float dy)
+void Velocity::setDy(double dy)
 {
 	this->dy = dy;
 }

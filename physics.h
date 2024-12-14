@@ -22,12 +22,11 @@ using namespace std;
 #include <stdio.h>
 #include "direction.h"
 #include "position.h"
-#include "testPhysics.h"
-//#include "testObject.h"
+
 
 class Physics {
 public:
-    //friend class TestObject;
+
     double gravityDirection(double xs, double ys);
     double gravityEquation(double h, double radius, double gravity);
     double heightAbovePlanet(double x, double y, double radius);

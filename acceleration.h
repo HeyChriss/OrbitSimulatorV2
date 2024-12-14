@@ -19,21 +19,22 @@ class Acceleration
     friend TestPosition;
     friend TestVelocity;
     friend TestAcceleration;
+    friend class TestHubble;
 
 private:
-    float ddx;
-    float ddy;
+    double ddx;
+    double ddy;
 
 public:
 
     // Constructors
     Acceleration() : ddx(0.0), ddy(0.0) {}
-    Acceleration(float ddx, float ddy) : ddx(ddx), ddy(ddy) {}
+    Acceleration(double ddx, double ddy) : ddx(ddx), ddy(ddy) {}
 
-    float getDdx()const { return ddx; }
-    float getDdy()const { return ddy; }
-    void setDdx(float rhsDdx) { ddx = rhsDdx; }
-    void setDdy(float rhsDdy) { ddy = rhsDdy; }
+    double getDdx()const { return ddx; }
+    double getDdy()const { return ddy; }
+    void setDdx(double rhsDdx) { ddx = rhsDdx; }
+    void setDdy(double rhsDdy) { ddy = rhsDdy; }
 };
 
 

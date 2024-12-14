@@ -11,17 +11,27 @@
 class Velocity
 {
 private:
-	float dx;
-	float dy;
+	double dx;
+	double dy;
 
 public:
 
 	friend class TestVelocity;
 	friend class TestCelestialObject;
 	friend class TestObject;
+	friend class TestHubble;
+	friend class TestDragon;
+	friend class TestGPS;
+	friend class TestShip;
+	friend class TestSputnik;
+	friend class TestStarlink;
+	friend class TestSatellite;
+	friend class TestProjectile;
+	friend class TestFragment;
+	friend class TestPart;
 
 	Velocity();
-	Velocity(float dx, float dy);
+	Velocity(double dx, double dy);
 
 	Velocity& operator += (const Velocity& twoD) {
 		this->dx += twoD.dx;
@@ -29,12 +39,12 @@ public:
 		return *this;
 	}
 
-	float getDx();
-	float getDy();
-	float getSpeed() const;
+	double getDx();
+	double getDy();
+	double getSpeed() const;
 	Angle getAngle();
-	void setDx(float dx);
-	void setDy(float dy);
+	void setDx(double dx);
+	void setDy(double dy);
 	void addMeters(double change, Angle angle);
 	void addMetersX(double dxMeters) { setMetersX(getMetersX() + dxMeters); }
 	void addMetersY(double dyMeters) { setMetersY(getMetersY() + dyMeters); }

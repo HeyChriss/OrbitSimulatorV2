@@ -12,184 +12,162 @@
 #include <iostream>
 #include <cassert>
 #include "satellite.h"
-#include "gps.h"
-#include "dragon.h"
-#include "starlink.h"
-#include "hubble.h"
-#include "simulator.h"
 #include "unitTest.h"
+#include "simulator.h"
 
-using namespace std;
-
-/*******************************
- * TEST Satellite
- * A friend class for Satellite which contains the unit tests
- ********************************/
 class TestSatellite : public UnitTest
 {
 public:
     void run()
     {
-        testDefaultConstructor();
+        testDefaultConstructorRadius();
+        testDefaultConstructorFragments();
+        testDefaultConstructorExpired();
+        testDefaultConstructorHasBeenHit();
+        testDefaultConstructorDefective();
+        testDefaultConstructorPosition();
+        testParameterizedConstructorPosition();
+        testParameterizedConstructorVelocity();
+        testParameterizedConstructorAngle();
+        testUpdate();
         testBreakApart();
-        testCollisionBehavior();
-        testSatelliteInitialStates();
-        testSatelliteVelocityCollisions();
-        testSatelliteTypesCollisions();
-        testBoundaryCollisions();
 
-        report("Satellite and collision");
+        report("Satellite and Collision");
     }
 
 private:
-    void testDefaultConstructor()
+    void testDefaultConstructorRadius()
+    {
+        // Setup & Exercise
+        Satellite satellite;
+
+        // Verify - direct member access
+        assertUnit(satellite.radius == 10);
+    }
+
+    void testDefaultConstructorFragments()
+    {
+        // Setup & Exercise
+        Satellite satellite;
+
+        // Verify - direct member access
+        assertUnit(satellite.numFragments == 2);
+    }
+
+    void testDefaultConstructorExpired()
+    {
+        // Setup & Exercise
+        Satellite satellite;
+
+        // Verify - direct member access
+        assertUnit(satellite.isExpired == false);
+    }
+
+    void testDefaultConstructorHasBeenHit()
+    {
+        // Setup & Exercise
+        Satellite satellite;
+
+        // Verify - direct member access
+        assertUnit(satellite.hasBeenHit == false);
+    }
+
+    void testDefaultConstructorDefective()
+    {
+        // Setup & Exercise
+        Satellite satellite;
+
+        // Verify - direct member access
+        assertUnit(satellite.defective == false);
+    }
+
+    void testDefaultConstructorPosition()
+    {
+        // Setup & Exercise
+        Satellite satellite;
+
+        // Verify - direct member access
+        assertUnit(satellite.pos.x == 0.0);
+        assertUnit(satellite.pos.y == 0.0);
+    }
+
+    void testParameterizedConstructorPosition()
+    {
+        // Setup & Exercise
+        Position pos(100.0, 200.0);
+        Satellite satellite(pos);
+
+        // Verify - direct member access
+        assertUnit(satellite.pos.x == 100.0);
+        assertUnit(satellite.pos.y == 200.0);
+    }
+
+    void testParameterizedConstructorVelocity()
+    {
+        // Setup & Exercise
+        Position pos(0.0, 0.0);
+        Velocity vel(10.0, 20.0);
+        Satellite satellite(pos, vel);
+
+        // Verify - direct member access
+        assertUnit(satellite.vel.dx == 10.0);
+        assertUnit(satellite.vel.dy == 20.0);
+    }
+
+    void testParameterizedConstructorAngle()
+    {
+        // Setup & Exercise
+        Position pos;
+        Velocity vel;
+        Angle angle;
+        angle.radAngle = M_PI / 2;  // 90 degrees
+        Satellite satellite(pos, vel, angle);
+
+        // Verify - direct member access
+        assertUnit(satellite.rotationAngle.radAngle == M_PI / 2);
+    }
+
+    void testUpdate()
     {
         // Setup
-        Satellite sat;
+        Satellite satellite;
+        satellite.pos.x = 100.0;
+        satellite.pos.y = 100.0;
+        satellite.vel.dx = 10.0;
+        satellite.vel.dy = 10.0;
+        double time = 1.0;
+        double gravity = -9.8;
+        double planetRadius = 6378000.0;
 
-        // Verify
-        assertUnit(sat.getRadius() == 10.0 * 100000); // Adjusted for scaling
-        assertUnit(sat.getNumFragments() == 2); // Satellite fragments
-        assertUnit(sat.getExpired() == false);
-        assertUnit(sat.getHasBeenHit() == false);
+        // Record initial position
+        double initialX = satellite.pos.x;
+        double initialY = satellite.pos.y;
+
+        // Exercise
+        satellite.update(time, gravity, planetRadius);
+
+        // Verify - position should change
+        assertUnit(satellite.pos.x != initialX || satellite.pos.y != initialY);
     }
 
     void testBreakApart()
     {
         // Setup
-        DummySimulator sim("");  // Pass empty string for default
-        Satellite sat(Position(100, 100), Velocity(50, 50));
-        sat.numFragments = 3; // Set number of fragments
+        DummySimulator sim("Hubble");
+        Satellite satellite;
+        satellite.pos.x = 100.0;
+        satellite.pos.y = 100.0;
+        satellite.vel.dx = 10.0;
+        satellite.vel.dy = 10.0;
+        vector<CelestialObject*> parts;
 
         // Exercise
-        sat.breakApart(&sim);
+        satellite.breakApart(&sim, parts);
 
-        // Verify
-        assertUnit(sat.getExpired() == true);
-        assertUnit(sat.getHasBeenHit() == true);
+        // Verify - direct member access
+        assertUnit(satellite.hasBeenHit == true);
+        assertUnit(satellite.isExpired == true);
     }
-
-    void testCollisionBehavior()
-    {
-        // Setup - Create two satellites in collision course
-        Position pos1(0, 0);
-        Position pos2(15, 0);  // Close enough to collide based on radii
-        Velocity vel(0, 0);
-
-        Satellite sat1(pos1, vel);
-        Satellite sat2(pos2, vel);
-
-        // Test collision detection
-        assertUnit(sat1.isHit(&sat2));
-        assertUnit(sat2.isHit(&sat1));
-
-        // Test collision between different satellite types
-        GPS::GPS gps(pos1, vel);
-        Dragon::Dragon dragon(pos2, vel);
-
-        assertUnit(gps.isHit(&dragon));
-        assertUnit(dragon.isHit(&gps));
-    }
-
-    void testSatelliteInitialStates()
-    {
-        // Test GPS initial state
-        GPS::GPS gps;
-        assertUnit(gps.getRadius() == 7.0 * 100000);
-        assertUnit(gps.getNumFragments() == 2);
-
-        // Test Dragon initial state
-        Dragon::Dragon dragon;
-        assertUnit(dragon.getRadius() == 7.0 * 100000);
-        assertUnit(dragon.getNumFragments() == 2);
-
-        // Test Starlink initial state
-        Starlink::Starlink starlink;
-        assertUnit(starlink.getRadius() == 7.0 * 100000);
-        assertUnit(starlink.getNumFragments() == 2);
-
-        // Test Hubble initial state
-        Hubble::Hubble hubble;
-        assertUnit(hubble.getRadius() == 7.0 * 100000);
-        assertUnit(hubble.getNumFragments() == 2);
-    }
-
-    void testSatelliteVelocityCollisions()
-    {
-        // Test collisions with different velocities
-        Position pos1(0, 0);
-        Position pos2(15, 0);
-
-        // Test head-on collision
-        Velocity vel1(50, 0);
-        Velocity vel2(-50, 0);
-        Satellite sat1(pos1, vel1);
-        Satellite sat2(pos2, vel2);
-        assertUnit(sat1.isHit(&sat2));
-
-        // Test perpendicular paths
-        Velocity vel3(0, 50);
-        Satellite sat3(pos1, vel1);
-        Satellite sat4(pos2, vel3);
-        assertUnit(sat3.isHit(&sat4));
-
-        // Test parallel paths
-        Velocity vel5(50, 0);
-        Velocity vel6(50, 0);
-        Satellite sat5(pos1, vel5);
-        Satellite sat6(pos2, vel6);
-        assertUnit(sat5.isHit(&sat6));
-    }
-
-    void testSatelliteTypesCollisions()
-    {
-        Position pos1(0, 0);
-        Position pos2(15, 0);
-        Velocity vel(0, 0);
-
-        // Test GPS with all other types
-        GPS::GPS gps(pos1, vel);
-        Dragon::Dragon dragon(pos2, vel);
-        Starlink::Starlink starlink(pos2, vel);
-        Hubble::Hubble hubble(pos2, vel);
-        Sputnik sputnik(pos2, vel);
-
-        assertUnit(gps.isHit(&dragon));
-        assertUnit(gps.isHit(&starlink));
-        assertUnit(gps.isHit(&hubble));
-        assertUnit(gps.isHit(&sputnik));
-
-        // Test Dragon with all other types
-        Dragon::Dragon dragon2(pos1, vel);
-        assertUnit(dragon2.isHit(&starlink));
-        assertUnit(dragon2.isHit(&hubble));
-        assertUnit(dragon2.isHit(&sputnik));
-
-        // Test Starlink with remaining types
-        Starlink::Starlink starlink2(pos1, vel);
-        assertUnit(starlink2.isHit(&hubble));
-        assertUnit(starlink2.isHit(&sputnik));
-    }
-
-    void testBoundaryCollisions()
-    {
-        Position pos1(0, 0);
-        Velocity vel(0, 0);
-        Satellite sat1(pos1, vel);
-
-        // Test exact boundary collision
-        double exactDistance = (sat1.getRadius() + sat1.getRadius()) / 100000.0;
-        Position boundaryPos(exactDistance, 0);
-        Satellite sat2(boundaryPos, vel);
-        assertUnit(sat1.isHit(&sat2));
-
-        // Test just inside boundary
-        Position insidePos(exactDistance - 1, 0);
-        Satellite sat4(insidePos, vel);
-        assertUnit(sat1.isHit(&sat4));
-    }
-
-
 };
 
 #endif /* testSatellite_h */

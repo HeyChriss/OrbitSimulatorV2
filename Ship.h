@@ -11,6 +11,7 @@
 class Spaceship : public Satellite
 {
 	friend class TestShip;
+	friend class TestProjectile;
 public:
 	Spaceship(Position pos = Position(), Velocity vel = Velocity(), Angle angle =
 		Angle()) : Satellite(pos, vel, angle) {

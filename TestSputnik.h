@@ -1,6 +1,6 @@
 /***********************************************************************
  * Header File:
- *    Test Sptunik
+ *    Test Sputnik
  * Author:
  *    Chris Mijangos and Seth Chen
  * Summary:
@@ -16,72 +16,98 @@
 #include "unitTest.h"
 #include "simulator.h"
 
-/*******************************
- * TEST Sputnik
- * A friend class for Sputnik which contains the Sputnik unit tests
- ********************************/
+ /*******************************
+  * TEST Sputnik
+  * A friend class for Sputnik which contains the Sputnik unit tests
+  ********************************/
 class TestSputnik : public UnitTest
 {
 public:
     void run()
     {
-        testConstructor();
+        testConstructorRadius();
+        testConstructorFragments();
+        testConstructorExpired();
+        testConstructorHasBeenHit();
+        testConstructorDefective();
+        testConstructorPosition();
         testBreakApart();
-        testInitialState();
 
         report("Sputnik");
     }
 
 private:
-    void testConstructor()
+    void testConstructorRadius()
     {
         // Setup & Exercise
         Sputnik sputnik;
 
-        // Verify initial state
-        assertUnit(sputnik.getRadius() == 400000.0); 
-        assertUnit(sputnik.getNumFragments() == 4);
-        assertUnit(!sputnik.getExpired());
-        assertUnit(!sputnik.getHasBeenHit());
+        // Verify - direct member access
+        assertUnit(sputnik.radius == 4);
+    }
+
+    void testConstructorFragments()
+    {
+        // Setup & Exercise
+        Sputnik sputnik;
+
+        // Verify - direct member access
+        assertUnit(sputnik.numFragments == 4);
+    }
+
+    void testConstructorExpired()
+    {
+        // Setup & Exercise
+        Sputnik sputnik;
+
+        // Verify - direct member access
+        assertUnit(sputnik.isExpired == false);
+    }
+
+    void testConstructorHasBeenHit()
+    {
+        // Setup & Exercise
+        Sputnik sputnik;
+
+        // Verify - direct member access
+        assertUnit(sputnik.hasBeenHit == false);
+    }
+
+    void testConstructorDefective()
+    {
+        // Setup & Exercise
+        Sputnik sputnik;
+
+        // Verify - direct member access
+        assertUnit(sputnik.defective == false);
+    }
+
+    void testConstructorPosition()
+    {
+        // Setup & Exercise
+        Sputnik sputnik;
+
+        // Verify - direct member access
+        assertUnit(sputnik.pos.x == 0.0);
+        assertUnit(sputnik.pos.y == 0.0);
     }
 
     void testBreakApart()
     {
         // Setup
-        Position pos(100, 100);
-        Velocity vel(50, 50);
-        DummySimulator* sim = new DummySimulator("Sputnik");
-        Sputnik* sputnik = new Sputnik(pos, vel);
-        sim->addObject(sputnik);
+        DummySimulator sim("Sputnik");
+        Sputnik sputnik;
+        sputnik.pos.x = 100;
+        sputnik.pos.y = 100;
+        sputnik.vel.dx = 50;
+        sputnik.vel.dy = 50;
 
         // Exercise
-        sputnik->breakApart(sim);
+        sputnik.breakApart(&sim);
 
-        // Verify
-        assertUnit(sputnik->getExpired() == true);
-        assertUnit(sputnik->getHasBeenHit() == true);
-
-        // Cleanup
-        delete sim;
-    }
-
-    void testInitialState()
-    {
-        // Setup
-        Position testPos(-36515095.13, 21082000.0);
-        Velocity testVel(2050.0, 2684.68);
-        Sputnik sputnik(testPos, testVel);
-
-        // Verify position
-        assertUnit(sputnik.getPosition().getMetersX() == -36515095.13);
-        assertUnit(sputnik.getPosition().getMetersY() == 21082000.0);
-
-        assertEquals(sputnik.getVelocity().getDx(), 2050.0);
-        assertEquals(sputnik.getVelocity().getDy(), 2684.68);
-
-        // Verify other properties
-        assertUnit(sputnik.getRadius() == 400000.0);  // 4 * 100000
-        assertUnit(sputnik.getNumFragments() == 4);
+        // Verify - direct member access
+        assertUnit(sputnik.isExpired == true);
+        assertUnit(sputnik.hasBeenHit == true);
     }
 };
 

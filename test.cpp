@@ -9,7 +9,6 @@
 
 #include "test.h"
 #include "testPosition.h"
-#include "testPhysics.h"
 #include "testHubble.h"
 #include "testShip.h"
 #include "testAcceleration.h"
@@ -25,6 +24,8 @@
 #include "TestProjectile.h"
 #include "TestFragment.h"
 #include "TestPart.h"
+#include "TestAngle.h"
+#include "testPhysics.h"
 
  /*****************************************************************
   * TEST RUNNER
