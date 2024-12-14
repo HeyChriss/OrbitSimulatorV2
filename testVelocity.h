@@ -14,29 +14,34 @@
 #include "velocity.h"
 #include "unitTest.h"
 #include "angle.h"
-#include <cmath>
 
-const double M_PI = std::acos(-1.0);
+constexpr double M_PI = 3.141592653589793;
 
-using namespace std;
-
-/*******************************
- * TEST Velocity
- * A friend class for Velocity which contains the unit tests
- ********************************/
 class TestVelocity : public UnitTest
 {
 public:
     void run()
     {
+        // Constructor tests
         testDefaultConstructor();
-        testParameterizedConstructor();
-        testSettersAndGetters();
+        testNonDefaultConstructor();
+
+        // Method tests
+        testAdditionOperator();
+        testMetersFromPixels();
+        testAddMetersX();
+        testAddMetersY();
+        testSetMetersX();
+        testSetMetersY();
+        testSetPixelsX();
+        testSetPixelsY();
+        testAddPixelsWithAngle();
+
+        // Getter method tests - only test these methods directly
+        testGetDx();
+        testGetDy();
         testGetSpeed();
         testGetAngle();
-        testAddMeters();
-        testAddPixels();
-        testAdditionOperator();
 
         report("Velocity");
     }
@@ -44,109 +49,183 @@ public:
 private:
     void testDefaultConstructor()
     {
-        // Setup
-        Velocity v;
+        // Setup & Exercise
+        Velocity vel;
 
-        // Verify
-        assertUnit(v.getDx() == 0.0f);
-        assertUnit(v.getDy() == 0.0f);
+        // Verify - direct member access
+        assertUnit(vel.dx == 0.0);
+        assertUnit(vel.dy == 0.0);
     }
 
-    void testParameterizedConstructor()
+    void testNonDefaultConstructor()
     {
-        // Setup
-        Velocity v(3.5f, -2.1f);
+        // Setup & Exercise
+        Velocity vel(3.0, 4.0);
 
-        // Verify
-        float epsilon = 1e-6f;
-        assertUnit(fabs(v.getDx() - 3.5f) < epsilon);
-        assertUnit(fabs(v.getDy() - -2.1f) < epsilon);
-    }
-
-    void testSettersAndGetters()
-    {
-        // Setup
-        Velocity v;
-        v.setDx(4.5f);
-        v.setDy(-3.2f);
-
-        // Verify
-        float epsilon = 1e-6f;
-        assertUnit(fabs(v.getDx() - 4.5f) < epsilon);
-        assertUnit(fabs(v.getDy() - -3.2f) < epsilon);
-    }
-
-    void testGetSpeed()
-    {
-        // Setup
-        Velocity v(3.0f, 4.0f); // Speed = sqrt(3^2 + 4^2) = 5.0
-
-        // Verify
-        assertUnit(v.getSpeed() == 5.0f);
-    }
-
-    void testGetAngle()
-    {
-        // Setup
-        Velocity v(1.0f, 1.0f);
-        Angle angle = v.getAngle();
-
-        // Verify
-        float epsilon = 1e-6f;
-        assertUnit(fabs(angle.getRadian() - atan2(1.0, 1.0)) < epsilon);
-    }
-
-    void testAddMeters()
-    {
-        // Setup
-        Velocity v;
-        Angle angle(45.0); // 45 degrees = pi/4 radians
-
-        // Exercise
-        v.addMeters(10.0, angle); // Adds 10 meters at 45 degrees
-
-        // Verify
-        float epsilon = 1e-6f;
-        assertUnit(fabs(v.getDx() - (10.0 * sin(angle.getDegree()))) < epsilon);
-        assertUnit(fabs(v.getDy() - (10.0 * cos(angle.getDegree()))) < epsilon);
-    }
-
-    void testAddPixels()
-    {
-        // Setup
-        Velocity v;
-        Angle angle;
-        angle.setDegree(90.0); // Set angle to 90 degrees (π/2 radians)
-
-        // Exercise
-        v.addPixels(20.0, angle); // Adds 20 pixels at 90 degrees
-
-        // Verify
-        double dx = v.getDx(); // Raw `dx` value in meters
-        double dy = v.getDy();
-
-        // Expected values
-        double expectedDx = 20.0 * Velocity::metersFromPixels; // Scaled by `metersFromPixels`
-        double expectedDy = 0.0; // Since cos(90°) = 0
-
-        assertUnit(dx > expectedDx - 0.1 && dx < expectedDx + 0.1); // Account for floating-point errors
-        assertUnit(dy > expectedDy - 0.1 && dy < expectedDy + 0.1);
+        // Verify - direct member access
+        assertUnit(vel.dx == 3.0);
+        assertUnit(vel.dy == 4.0);
     }
 
     void testAdditionOperator()
     {
         // Setup
-        Velocity v1(3.0f, 4.0f);
-        Velocity v2(1.0f, 2.0f);
+        Velocity vel1(3.0, 4.0);
+        Velocity vel2(2.0, 1.0);
 
         // Exercise
-        v1 += v2;
+        vel1 += vel2;
 
-        // Verify
-        assertUnit(v1.getDx() == 4.0f);
-        assertUnit(v1.getDy() == 6.0f);
+        // Verify - direct member access
+        assertUnit(vel1.dx == 5.0);
+        assertUnit(vel1.dy == 5.0);
     }
 
+    void testMetersFromPixels()
+    {
+        // Setup
+        Velocity vel;
+        vel.metersFromPixels = 50.0;
+
+        // Verify - direct member access
+        assertUnit(vel.metersFromPixels == 50.0);
+    }
+
+    void testAddMetersX()
+    {
+        // Setup
+        Velocity vel(10.0, 20.0);
+
+        // Exercise
+        vel.addMetersX(5.0);
+
+        // Verify - direct member access
+        assertUnit(vel.dx == 15.0);
+        assertUnit(vel.dy == 20.0);
+    }
+
+    void testAddMetersY()
+    {
+        // Setup
+        Velocity vel(10.0, 20.0);
+
+        // Exercise
+        vel.addMetersY(5.0);
+
+        // Verify - direct member access
+        assertUnit(vel.dx == 10.0);
+        assertUnit(vel.dy == 25.0);
+    }
+
+    void testSetMetersX()
+    {
+        // Setup
+        Velocity vel(10.0, 20.0);
+
+        // Exercise
+        vel.setMetersX(15.0);
+
+        // Verify - direct member access
+        assertUnit(vel.dx == 15.0);
+    }
+
+    void testSetMetersY()
+    {
+        // Setup
+        Velocity vel(10.0, 20.0);
+
+        // Exercise
+        vel.setMetersY(25.0);
+
+        // Verify - direct member access
+        assertUnit(vel.dy == 25.0);
+    }
+
+    void testSetPixelsX()
+    {
+        // Setup
+        Velocity vel;
+        vel.metersFromPixels = 2.0;
+
+        // Exercise
+        vel.setPixelsX(10.0);
+
+        // Verify - direct member access
+        assertUnit(vel.dx == 20.0);  // 10 pixels * 2 meters/pixel
+    }
+
+    void testSetPixelsY()
+    {
+        // Setup
+        Velocity vel;
+        vel.metersFromPixels = 2.0;
+
+        // Exercise
+        vel.setPixelsY(10.0);
+
+        // Verify - direct member access
+        assertUnit(vel.dy == 20.0);  // 10 pixels * 2 meters/pixel
+    }
+
+
+
+    void testAddPixelsWithAngle()
+    {
+        // Setup
+        Velocity vel;
+        vel.metersFromPixels = 2.0;
+        Angle angle;
+        angle.radAngle = M_PI / 2.0;  // 90 degrees
+
+        // Exercise
+        vel.addPixels(10.0, angle);
+
+        // Verify - direct member access
+        assertUnit(fabs(vel.dx - 20.0) < 0.001);  // Should be approximately 20 (10 pixels * 2 meters/pixel)
+        assertUnit(fabs(vel.dy) < 0.001);         // Should be approximately 0
+    }
+
+    // Getter method tests - these specifically test the getter methods
+    void testGetDx()
+    {
+        // Setup
+        Velocity vel;
+        vel.dx = 5.0;
+
+        // Exercise & Verify
+        assertUnit(vel.getDx() == 5.0);
+    }
+
+    void testGetDy()
+    {
+        // Setup
+        Velocity vel;
+        vel.dy = 5.0;
+
+        // Exercise & Verify
+        assertUnit(vel.getDy() == 5.0);
+    }
+
+    void testGetSpeed()
+    {
+        // Setup
+        Velocity vel(3.0, 4.0);
+
+        // Exercise & Verify
+        assertUnit(vel.getSpeed() == 5.0);
+    }
+
+    void testGetAngle()
+    {
+        // Setup
+        Velocity vel(1.0, 1.0);
+
+        // Exercise
+        Angle angle = vel.getAngle();
+
+        // Verify - should be 45 degrees (π/4 radians)
+        assertUnit(fabs(angle.radAngle - M_PI / 4) < 0.001);
+    }
 };
 
 #endif /* testVelocity_h */

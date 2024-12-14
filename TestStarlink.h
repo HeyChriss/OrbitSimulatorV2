@@ -15,88 +15,191 @@
 #include "unitTest.h"
 #include "simulator.h"
 
-/*******************************
- * TEST Starlink
- * A friend class for Starlink which contains the Starlink unit tests
- ********************************/
+ /*******************************
+  * TEST Starlink
+  * A friend class for Starlink which contains the Starlink unit tests
+  ********************************/
 class TestStarlink : public UnitTest
 {
 public:
     void run()
     {
-        testConstructor();
-        testBreakApart();
-        testStarlinkParts();
-        testInitialState();
+        testStarlinkConstructorRadius();
+        testStarlinkConstructorFragments();
+        testStarlinkConstructorExpired();
+        testStarlinkConstructorHasBeenHit();
+        testStarlinkConstructorDefective();
+        testStarlinkBreakApart();
+
+        testStarlinkBodyRadius();
+        testStarlinkBodyFragments();
+        testStarlinkBodyOrigin();
+        testStarlinkBodyExpired();
+        testStarlinkBodyHasBeenHit();
+
+        testStarlinkArrayRadius();
+        testStarlinkArrayFragments();
+        testStarlinkArrayOrigin();
+        testStarlinkArrayExpired();
+        testStarlinkArrayHasBeenHit();
 
         report("Starlink");
     }
 
 private:
-    void testConstructor()
+    // Main Starlink tests
+    void testStarlinkConstructorRadius()
     {
         // Setup & Exercise
         Starlink::Starlink starlink;
 
-        // Verify
-        assertUnit(starlink.getRadius() == 700000.0);  // 7 * 100000
-        assertUnit(starlink.getNumFragments() == 2);
-        assertUnit(!starlink.getExpired());
-        assertUnit(!starlink.getHasBeenHit());
+        // Verify - direct member access
+        assertUnit(starlink.radius == 7);
     }
 
-    void testBreakApart()
+    void testStarlinkConstructorFragments()
+    {
+        // Setup & Exercise
+        Starlink::Starlink starlink;
+
+        // Verify - direct member access
+        assertUnit(starlink.numFragments == 2);
+    }
+
+    void testStarlinkConstructorExpired()
+    {
+        // Setup & Exercise
+        Starlink::Starlink starlink;
+
+        // Verify - direct member access
+        assertUnit(starlink.isExpired == false);
+    }
+
+    void testStarlinkConstructorHasBeenHit()
+    {
+        // Setup & Exercise
+        Starlink::Starlink starlink;
+
+        // Verify - direct member access
+        assertUnit(starlink.hasBeenHit == false);
+    }
+
+    void testStarlinkConstructorDefective()
+    {
+        // Setup & Exercise
+        Starlink::Starlink starlink;
+
+        // Verify - direct member access
+        assertUnit(starlink.defective == false);
+    }
+
+    void testStarlinkBreakApart()
     {
         // Setup
-        Position pos(100, 100);
-        Velocity vel(50, 50);
-        DummySimulator* sim = new DummySimulator("Starlink");
-        Starlink::Starlink* starlink = new Starlink::Starlink(pos, vel);
-        sim->addObject(starlink);
+        DummySimulator sim("Starlink");
+        Starlink::Starlink starlink;
+        starlink.pos.x = 100;
+        starlink.pos.y = 100;
+        starlink.vel.dx = 50;
+        starlink.vel.dy = 50;
 
         // Exercise
-        starlink->breakApart(sim);
+        starlink.breakApart(&sim);
 
-        // Verify
-        assertUnit(starlink->getExpired() == true);
-
-        // Cleanup
-        delete sim;
+        // Verify - direct member access
+        assertUnit(starlink.isExpired == true);
     }
 
-    void testStarlinkParts()
+    // StarlinkBody tests
+    void testStarlinkBodyRadius()
     {
-        // Test StarlinkBody
+        // Setup & Exercise
         Starlink::StarlinkBody body;
-        assertUnit(body.getRadius() == 200000.0);  // 2 * 100000
-        assertUnit(body.getNumFragments() == 3);
-        assertUnit(body.partOrigin == "Starlink");
 
-        // Test StarlinkArray
+        // Verify - direct member access
+        assertUnit(body.radius == 2);
+    }
+
+    void testStarlinkBodyFragments()
+    {
+        // Setup & Exercise
+        Starlink::StarlinkBody body;
+
+        // Verify - direct member access
+        assertUnit(body.numFragments == 3);
+    }
+
+    void testStarlinkBodyOrigin()
+    {
+        // Setup & Exercise
+        Starlink::StarlinkBody body;
+
+        // Verify - direct member access
+        assertUnit(body.partOrigin == "Starlink");
+    }
+
+    void testStarlinkBodyExpired()
+    {
+        // Setup & Exercise
+        Starlink::StarlinkBody body;
+
+        // Verify - direct member access
+        assertUnit(body.isExpired == false);
+    }
+
+    void testStarlinkBodyHasBeenHit()
+    {
+        // Setup & Exercise
+        Starlink::StarlinkBody body;
+
+        // Verify - direct member access
+        assertUnit(body.hasBeenHit == false);
+    }
+
+    // StarlinkArray tests
+    void testStarlinkArrayRadius()
+    {
+        // Setup & Exercise
         Starlink::StarlinkArray array;
-        assertUnit(array.getRadius() == 400000.0);  // 4 * 100000
-        assertUnit(array.getNumFragments() == 3);
+
+        // Verify - direct member access
+        assertUnit(array.radius == 4);
+    }
+
+    void testStarlinkArrayFragments()
+    {
+        // Setup & Exercise
+        Starlink::StarlinkArray array;
+
+        // Verify - direct member access
+        assertUnit(array.numFragments == 3);
+    }
+
+    void testStarlinkArrayOrigin()
+    {
+        // Setup & Exercise
+        Starlink::StarlinkArray array;
+
+        // Verify - direct member access
         assertUnit(array.partOrigin == "Starlink");
     }
 
-    void testInitialState()
+    void testStarlinkArrayExpired()
     {
-        // Setup
-        Position testPos(0.0, -13020000.0);
-        Velocity testVel(5800.0, 0.0);
-        Starlink::Starlink starlink(testPos, testVel);
+        // Setup & Exercise
+        Starlink::StarlinkArray array;
 
-        // Verify position
-        assertEquals(starlink.getPosition().getMetersX(), 0.0);
-        assertEquals(starlink.getPosition().getMetersY(), -13020000.0);
+        // Verify - direct member access
+        assertUnit(array.isExpired == false);
+    }
 
-        // Verify velocity
-        assertEquals(starlink.getVelocity().getDx(), 5800.0);
-        assertEquals(starlink.getVelocity().getDy(), 0.0);
+    void testStarlinkArrayHasBeenHit()
+    {
+        // Setup & Exercise
+        Starlink::StarlinkArray array;
 
-        // Verify other properties
-        assertUnit(starlink.getRadius() == 700000.0);  // 7 * 100000
-        assertUnit(starlink.getNumFragments() == 2);
+        // Verify - direct member access
+        assertUnit(array.hasBeenHit == false);
     }
 };
 

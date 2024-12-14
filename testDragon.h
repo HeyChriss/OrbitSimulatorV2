@@ -15,72 +15,165 @@
 #include "unitTest.h"
 #include "simulator.h"
 
-/*******************************
- * TEST Dragon
- * A friend class for Dragon which contains the Dragon unit tests
- ********************************/
+ /*******************************
+  * TEST Dragon
+  * A friend class for Dragon which contains the Dragon unit tests
+  ********************************/
 class TestDragon : public UnitTest
 {
 public:
     void run()
     {
-        testConstructor();
-        testBreakApart();
-        testDragonParts();
+        testDragonConstructorRadius();
+        testDragonConstructorFragments();
+        testDragonConstructorExpired();
+        testDragonConstructorHasBeenHit();
+        testDragonBreakApart();
+        testDragonCenterRadius();
+        testDragonCenterFragments();
+        testDragonCenterOrigin();
+        testDragonLeftRadius();
+        testDragonLeftFragments();
+        testDragonLeftOrigin();
+        testDragonRightRadius();
+        testDragonRightFragments();
+        testDragonRightOrigin();
 
         report("Dragon");
     }
 
 private:
-    void testConstructor()
+    void testDragonConstructorRadius()
     {
         // Setup & Exercise
         Dragon::Dragon dragon;
 
-        // Verify
-        assertUnit(dragon.getRadius() == 700000.0);  // 7 * 100000
-        assertUnit(dragon.getNumFragments() == 2);
-        assertUnit(!dragon.getExpired());
-        assertUnit(!dragon.getHasBeenHit());
+        // Verify - direct member access
+        assertUnit(dragon.radius == 7);
     }
 
-    void testBreakApart()
+    void testDragonConstructorFragments()
+    {
+        // Setup & Exercise
+        Dragon::Dragon dragon;
+
+        // Verify - direct member access
+        assertUnit(dragon.numFragments == 2);
+    }
+
+    void testDragonConstructorExpired()
+    {
+        // Setup & Exercise
+        Dragon::Dragon dragon;
+
+        // Verify - direct member access
+        assertUnit(dragon.isExpired == false);
+    }
+
+    void testDragonConstructorHasBeenHit()
+    {
+        // Setup & Exercise
+        Dragon::Dragon dragon;
+
+        // Verify - direct member access
+        assertUnit(dragon.hasBeenHit == false);
+    }
+
+    void testDragonBreakApart()
     {
         // Setup
-        Position pos(100, 100);
-        Velocity vel(50, 50);
-        DummySimulator* sim = new DummySimulator("Dragon");  // Specify Dragon type
-        Dragon::Dragon* dragon = new Dragon::Dragon(pos, vel);
-        sim->addObject(dragon);  // Add dragon to simulator
+        DummySimulator sim("Dragon");
+        Dragon::Dragon dragon;
+        dragon.pos.x = 100;
+        dragon.pos.y = 100;
+        dragon.vel.dx = 50;
+        dragon.vel.dy = 50;
 
         // Exercise
-        dragon->breakApart(sim);
+        dragon.breakApart(&sim);
 
-        // Verify
-        assertUnit(dragon->getExpired() == true);
-
-        // Cleanup
-        delete sim;
+        // Verify - direct member access
+        assertUnit(dragon.isExpired == true);
     }
 
-    void testDragonParts()
+    void testDragonCenterRadius()
     {
-        // Test DragonCenter
+        // Setup & Exercise
         Dragon::DragonCenter center;
-        assertUnit(center.getRadius() == 600000.0);  // 6 * 100000
-        assertUnit(center.getNumFragments() == 4);
+
+        // Verify - direct member access
+        assertUnit(center.radius == 6);
+    }
+
+    void testDragonCenterFragments()
+    {
+        // Setup & Exercise
+        Dragon::DragonCenter center;
+
+        // Verify - direct member access
+        assertUnit(center.numFragments == 4);
+    }
+
+    void testDragonCenterOrigin()
+    {
+        // Setup & Exercise
+        Dragon::DragonCenter center;
+
+        // Verify - direct member access
         assertUnit(center.partOrigin == "Dragon");
+    }
 
-        // Test DragonLeft
+    void testDragonLeftRadius()
+    {
+        // Setup & Exercise
         Dragon::DragonLeft left;
-        assertUnit(left.getRadius() == 600000.0);    // 6 * 100000
-        assertUnit(left.getNumFragments() == 2);
-        assertUnit(left.partOrigin == "Dragon");
 
-        // Test DragonRight
+        // Verify - direct member access
+        assertUnit(left.radius == 6);
+    }
+
+    void testDragonLeftFragments()
+    {
+        // Setup & Exercise
+        Dragon::DragonLeft left;
+
+        // Verify - direct member access
+        assertUnit(left.numFragments == 2);
+    }
+
+    void testDragonLeftOrigin()
+    {
+        // Setup & Exercise
+        Dragon::DragonLeft left;
+
+        // Verify - direct member access
+        assertUnit(left.partOrigin == "Dragon");
+    }
+
+    void testDragonRightRadius()
+    {
+        // Setup & Exercise
         Dragon::DragonRight right;
-        assertUnit(right.getRadius() == 600000.0);   // 6 * 100000
-        assertUnit(right.getNumFragments() == 2);
+
+        // Verify - direct member access
+        assertUnit(right.radius == 6);
+    }
+
+    void testDragonRightFragments()
+    {
+        // Setup & Exercise
+        Dragon::DragonRight right;
+
+        // Verify - direct member access
+        assertUnit(right.numFragments == 2);
+    }
+
+    void testDragonRightOrigin()
+    {
+        // Setup & Exercise
+        Dragon::DragonRight right;
+
+        // Verify - direct member access
         assertUnit(right.partOrigin == "Dragon");
     }
 };

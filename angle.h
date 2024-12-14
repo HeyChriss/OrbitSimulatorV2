@@ -10,12 +10,18 @@
 #pragma once
 #include <cmath>
 
-#include "testAngle.h"
 
 class Angle
 {
 public:
     friend class TestAngle;
+    friend class TestShip;
+    friend class TestCelestialObject;
+    friend class TestVelocity;
+    friend class TestSatellite;
+    friend class TestProjectile;
+    friend class TestFragment;
+    friend class TestPart;
 
     Angle() : radAngle(0.0) {}
     Angle(double radAngle) : radAngle(radAngle) { this->normalize(); }

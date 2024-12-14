@@ -28,6 +28,8 @@ class Simulator {
 public:
     friend TestHubble;
     friend TestDragon;
+    friend class TestCelestialObject;
+   
 
     Simulator(bool dummyConstructor) {}
 

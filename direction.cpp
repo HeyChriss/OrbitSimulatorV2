@@ -1,4 +1,4 @@
-#include "direction.h"
+﻿#include "direction.h"
 #include <iostream>
 #include <cmath>
 using namespace std;
@@ -22,19 +22,20 @@ double Direction::convertToRadians(double d)
 
 void Direction::normalize()
 {
-    while (radians < fullRevolutionRad) {
-        radians += fullRevolutionRad;
+    // Normalize degrees
+    while (degrees < 0) {
+        degrees += fullRevolutionDeg; // Add 360° to bring it into [0, 360)
+    }
+    while (degrees >= fullRevolutionDeg) {
+        degrees -= fullRevolutionDeg; // Subtract 360° to bring it into [0, 360)
     }
 
-    while (radians > fullRevolutionRad) {
-        radians -= fullRevolutionRad;
+    // Normalize radians
+    while (radians < 0) {
+        radians += fullRevolutionRad; // Add 2π to bring it into [0, 2π)
     }
-    while (degrees < fullRevolutionDeg) {
-        degrees += fullRevolutionDeg;
-    }
-
-    while (degrees > fullRevolutionDeg) {
-        degrees -= fullRevolutionDeg;
+    while (radians >= fullRevolutionRad) {
+        radians -= fullRevolutionRad; // Subtract 2π to bring it into [0, 2π)
     }
 }
 

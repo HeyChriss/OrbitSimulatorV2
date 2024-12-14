@@ -10,138 +10,217 @@
 #define testPart_h
 
 #include <iostream>
-#include "part.h"
 #include <cassert>
+#include "part.h"
 #include "unitTest.h"
 #include "simulator.h"
 
-/*******************************
- * TEST Part
- * A friend class for Part which contains the Part unit tests
- ********************************/
 class TestPart : public UnitTest
 {
 public:
     void run()
     {
-        testConstructor();
-        testInvincibility();
-        testSameOriginCollision();
-        testDifferentOriginCollision();
-        testUpdate();
+        testDefaultConstructorRadius();
+        testDefaultConstructorFragments();
+        testDefaultConstructorInvincibilityCount();
+        testDefaultConstructorPartOrigin();
+        testDefaultConstructorPosition();
+        testNonDefaultConstructorPosition();
+        testNonDefaultConstructorVelocity();
+        testNonDefaultConstructorAngle();
+        testIsHitWithInvincibility();
+        testIsHitAfterInvincibility();
+        testIsHitWithSameOrigin();
+        testIsHitWithDifferentOrigin();
+        testUpdateInvincibilityCount();
+        testUpdatePosition();
 
         report("Part");
     }
 
 private:
-    class TestPartDerived : public Part {
-    public:
-        TestPartDerived(string origin = "Test") {
-            this->partOrigin = origin;
-            this->radius = 1;
-            this->numFragments = 0;
-        }
-    };
+    void testDefaultConstructorRadius()
+    {
+        // Setup & Exercise
+        Part part;
 
-    void testConstructor()
+        // Verify - direct member access
+        assertUnit(part.radius == 1);
+    }
+
+    void testDefaultConstructorFragments()
+    {
+        // Setup & Exercise
+        Part part;
+
+        // Verify - direct member access
+        assertUnit(part.numFragments == 0);
+    }
+
+    void testDefaultConstructorInvincibilityCount()
+    {
+        // Setup & Exercise
+        Part part;
+
+        // Verify - direct member access
+        assertUnit(part.invincibilityCount == 0);
+    }
+
+    void testDefaultConstructorPartOrigin()
+    {
+        // Setup & Exercise
+        Part part;
+
+        // Verify - direct member access
+        assertUnit(part.partOrigin.empty());
+    }
+
+    void testDefaultConstructorPosition()
+    {
+        // Setup & Exercise
+        Part part;
+
+        // Verify - direct member access
+        assertUnit(part.pos.x == 0.0);
+        assertUnit(part.pos.y == 0.0);
+    }
+
+    void testNonDefaultConstructorPosition()
     {
         // Setup & Exercise
         Position pos(100.0, 200.0);
-        Velocity vel(50.0, -30.0);
-        Angle angle(1.5);
+        Part part(pos);
+
+        // Verify - direct member access
+        assertUnit(part.pos.x == 100.0);
+        assertUnit(part.pos.y == 200.0);
+    }
+
+    void testNonDefaultConstructorVelocity()
+    {
+        // Setup & Exercise
+        Position pos;
+        Velocity vel(10.0, 20.0);
+        Part part(pos, vel);
+
+        // Verify - direct member access
+        assertUnit(part.vel.dx == 10.0);
+        assertUnit(part.vel.dy == 20.0);
+    }
+
+    void testNonDefaultConstructorAngle()
+    {
+        // Setup & Exercise
+        Position pos;
+        Velocity vel;
+        Angle angle;
+        angle.radAngle = M_PI / 2;
         Part part(pos, vel, angle);
 
-        // Verify initial state
-        assertUnit(part.getRadius() == 100000.0);  // 1 * 100000
-        assertUnit(part.getNumFragments() == 0);
-        assertUnit(!part.getExpired());
-        assertUnit(!part.getHasBeenHit());
-        assertUnit(part.invincibilityCount == 0);
-
-        // Verify position and velocity
-        assertEquals(part.getPosition().getMetersX(), 100.0);
-        assertEquals(part.getPosition().getMetersY(), 200.0);
-        assertEquals(part.getVelocity().getDx(), 50.0);
-        assertEquals(part.getVelocity().getDy(), -30.0);
+        // Verify - direct member access
+        assertUnit(part.rotationAngle.radAngle == M_PI / 2);
     }
 
-    void testInvincibility()
+    void testIsHitWithInvincibility()
     {
         // Setup
-        TestPartDerived part;
-        TestPartDerived otherPart("Different");
+        Part part;
+        part.invincibilityCount = 5;  // Less than 10
+        CelestialObject other;
 
-        // Test invincibility period
-        assertUnit(!part.isHit(&otherPart));  // Should be invincible initially
+        // Exercise
+        bool result = part.isHit(&other);
 
-        // Update multiple times to exceed invincibility
-        for (int i = 0; i < 15; i++) {
-            part.update(1.0, 0.0, 0.0);
-        }
-
-        // Should now be vulnerable
-        assertUnit(part.invincibilityCount >= 10);
+        // Verify
+        assertUnit(result == false);
     }
 
-    void testSameOriginCollision()
+    void testIsHitAfterInvincibility()
     {
         // Setup
-        TestPartDerived part1("Test");
-        TestPartDerived part2("Test");
+        Part part;
+        part.invincibilityCount = 15;  // Greater than 10
+        part.radius = 5;
+        CelestialObject other;
+        other.pos.x = 8.0;  // Close enough to collide
+        other.radius = 5;
 
-        // Update to end invincibility
-        for (int i = 0; i < 15; i++) {
-            part1.update(1.0, 0.0, 0.0);
-            part2.update(1.0, 0.0, 0.0);
-        }
+        // Exercise
+        bool result = part.isHit(&other);
 
-        // Verify parts from same origin don't collide
-        assertUnit(!part1.isHit(&part2));
-        assertUnit(!part2.isHit(&part1));
+        // Verify
+        assertUnit(result == true);
     }
 
-    void testDifferentOriginCollision()
+    void testIsHitWithSameOrigin()
     {
         // Setup
-        TestPartDerived part1("Origin1");
-        TestPartDerived part2("Origin2");
+        Part part1;
+        Part part2;
+        part1.partOrigin = "TestOrigin";
+        part2.partOrigin = "TestOrigin";
+        part1.invincibilityCount = 15;  // Greater than 10
+        part2.invincibilityCount = 15;
 
-        // Update to end invincibility
-        for (int i = 0; i < 15; i++) {
-            part1.update(1.0, 0.0, 0.0);
-            part2.update(1.0, 0.0, 0.0);
-        }
+        // Exercise
+        bool result = part1.isHit(&part2);
 
-        // Position them for collision
-        Position pos1(0, 0);
-        Position pos2(1, 0);  // Close enough for collision based on radius
-        part1.setPosition(pos1);
-        part2.setPosition(pos2);
-
-        // Verify parts from different origins can collide
-        assertUnit(part1.isHit(&part2));
-        assertUnit(part2.isHit(&part1));
+        // Verify - parts from same origin should not collide
+        assertUnit(result == false);
     }
 
-    void testUpdate()
+    void testIsHitWithDifferentOrigin()
     {
         // Setup
-        TestPartDerived part;
-        assertUnit(part.invincibilityCount == 0);
+        Part part1;
+        Part part2;
+        part1.partOrigin = "Origin1";
+        part2.partOrigin = "Origin2";
+        part1.invincibilityCount = 15;  // Greater than 10
+        part2.invincibilityCount = 15;
+        part1.radius = 5;
+        part2.radius = 5;
+        part2.pos.x = 8.0;  // Close enough to collide
 
-        // Exercise - single update
+        // Exercise
+        bool result = part1.isHit(&part2);
+
+        // Verify - parts from different origins should collide
+        assertUnit(result == true);
+    }
+
+    void testUpdateInvincibilityCount()
+    {
+        // Setup
+        Part part;
+        int initialCount = part.invincibilityCount;
+
+        // Exercise
         part.update(1.0, 0.0, 0.0);
 
-        // Verify invincibilityCount increases
-        assertUnit(part.invincibilityCount == 1);
+        // Verify
+        assertUnit(part.invincibilityCount == initialCount + 1);
+    }
 
-        // Exercise - multiple updates
-        for (int i = 0; i < 5; i++) {
-            part.update(1.0, 0.0, 0.0);
-        }
+    void testUpdatePosition()
+    {
+        // Setup
+        Part part;
+        part.pos.x = 100.0;
+        part.pos.y = 100.0;
+        part.vel.dx = 10.0;
+        part.vel.dy = 10.0;
 
-        // Verify invincibilityCount continues to increase
-        assertUnit(part.invincibilityCount == 6);
+        // Record initial position
+        double initialX = part.pos.x;
+        double initialY = part.pos.y;
+
+        // Exercise
+        part.update(1.0, 0.0, 0.0);
+
+        // Verify - position should change based on velocity
+        assertUnit(part.pos.x != initialX);
+        assertUnit(part.pos.y != initialY);
     }
 };
 

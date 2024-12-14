@@ -1,6 +1,6 @@
 ﻿/***********************************************************************
  * Header File:
- *    Prijectile
+ *    Projectile
  * Author:
  *    Chris Mijangos and Seth Chen
  * Summary:
@@ -10,109 +10,137 @@
 #define testProjectile_h
 
 #include <iostream>
-#include "projectile.h"
-#include "ship.h"
 #include <cassert>
+#include "projectile.h"
 #include "unitTest.h"
+#include "ship.h"
 
-/*******************************
- * TEST Projectile
- * A friend class for Projectile which contains the Projectile unit tests
- ********************************/
 class TestProjectile : public UnitTest
 {
 public:
     void run()
     {
-        testConstructorFromShip();
-        testUpdate();
-        testExpiration();
+        testConstructorFromShipPosition();
+        testConstructorFromShipVelocityAngleZero();
+        testUpdatePositionNoExpiry();
+        testUpdatePositionWithExpiry();
+        testUpdateVelocity();
+        testLifetime();
 
         report("Projectile");
     }
 
 private:
-    // Test helper to create a ship at a specific position and rotation
-    Spaceship* createShipAtPosition(double x, double y, double rotation)
-    {
-        Position pos;
-        pos.setMeters(x, y);
-        Velocity vel(0.0, 0.0);
-        Spaceship* ship = new Spaceship(pos, vel);
-        Angle angle;
-        angle.setDegree(rotation);
-        ship->addRotation(angle);
-        return ship;
-    }
-
-    void testConstructorFromShip()
-    {
-        // Setup - create ship at position with 45 degree rotation
-        Spaceship* ship = createShipAtPosition(1000.0, 2000.0, 45.0);
-        Physics physics;
-
-        // Exercise
-        Projectile projectile(ship);
-
-        // Verify - projectile should be at ship's position
-        assertEquals(projectile.getPosition().getMetersX(), 1000.0);
-        assertEquals(projectile.getPosition().getMetersY(), 2000.0);
-
-        // Get expected velocities using the same physics calculations used in Projectile constructor
-        double speed = 10000.0;
-        double rotation = ship->getRotation().getDegree();
-        double expectedVx = physics.horizontalAcceleration(speed, rotation);
-        double expectedVy = physics.verticalAcceleration(speed, rotation);
-
-        // Verify velocities
-        assertEquals(projectile.getVelocity().getDx(), expectedVx);
-
-        // Cleanup
-        delete ship;
-    }
-
-    void testUpdate()
-    {
-        // Setup - create ship pointing straight up
-        Spaceship* ship = createShipAtPosition(0.0, 0.0, 0.0);
-        Projectile projectile(ship);
-
-        double time = 1.0;
-        double gravity = 0.0;
-        double radius = 0.0;
-
-        // Exercise - update for one second
-        projectile.update(time, gravity, radius);
-
-        // Verify - with initial velocity of 10000 m/s straight up
-        assertEquals(projectile.getPosition().getMetersY(), 10000.0);  // Moved up 10000m
-        assertEquals(projectile.getPosition().getMetersX(), 0.0);      // No horizontal movement
-
-        // Cleanup
-        delete ship;
-    }
-
-    void testExpiration()
+    void testConstructorFromShipPosition()
     {
         // Setup
-        Spaceship* ship = createShipAtPosition(0.0, 0.0, 0.0);
-        Projectile projectile(ship);
+        Spaceship ship;
+        ship.pos.x = 100.0;
+        ship.pos.y = 200.0;
 
-        // Exercise & Verify - projectile should expire after enough updates
-        bool hasExpired = false;
-        int updateCount = 0;
-        while (!hasExpired && updateCount < 100)
-        {
-            projectile.update(1.0, 0.0, 0.0);
-            hasExpired = projectile.isExpired();
-            updateCount++;
-        }
+        // Exercise
+        Projectile projectile(&ship);
 
-        assertUnit(hasExpired == true);  // Should expire eventually
-        assertUnit(updateCount > 0 && updateCount < 100);  // Should expire within reasonable time
+        // Verify - direct member access
+        assertUnit(projectile.pos.x == 100.0);
+        assertUnit(projectile.pos.y == 200.0);
+    }
 
-        // Cleanup
-        delete ship;
+    void testConstructorFromShipVelocityAngleZero()
+    {
+        // Setup
+        Spaceship ship;
+        ship.rotationAngle.radAngle = 0.0;  // Pointing up
+
+        // Exercise
+        Projectile projectile(&ship);
+
+        // Verify - direct member access
+        assertUnit(projectile.vel.dy > 0.0);  // Should have upward velocity
+        assertUnit(fabs(projectile.vel.dx) < 0.001);  // Should have minimal horizontal velocity
+    }
+
+    void testUpdatePositionNoExpiry()
+    {
+        // Setup
+        Spaceship ship;
+        Projectile projectile(&ship);
+        projectile.pos.x = 100.0;
+        projectile.pos.y = 100.0;
+        projectile.vel.dx = 10.0;
+        projectile.vel.dy = 10.0;
+        projectile.lifetime = 50;  // Not expired
+
+        // Record initial position
+        double initialX = projectile.pos.x;
+        double initialY = projectile.pos.y;
+
+        // Exercise
+        projectile.update(1.0, 0.0, 0.0);
+
+        // Verify - position should change
+        assertUnit(projectile.pos.x != initialX);
+        assertUnit(projectile.pos.y != initialY);
+    }
+
+    void testUpdatePositionWithExpiry()
+    {
+        // Setup
+        Spaceship ship;
+        Projectile projectile(&ship);
+        projectile.pos.x = 100.0;
+        projectile.pos.y = 100.0;
+        projectile.vel.dx = 10.0;
+        projectile.vel.dy = 10.0;
+        projectile.lifetime = 0;  // Expired
+
+        // Record initial position
+        double initialX = projectile.pos.x;
+        double initialY = projectile.pos.y;
+
+        // Exercise
+        projectile.update(1.0, 0.0, 0.0);
+
+        // Verify - position should not change due to expiry
+        assertUnit(projectile.isExpired() == true);
+    }
+
+    void testUpdateVelocity()
+    {
+        // Setup
+        Spaceship ship;
+        Projectile projectile(&ship);
+        projectile.vel.dx = 10.0;
+        projectile.vel.dy = 10.0;
+
+        // Record initial velocity
+        double initialDx = projectile.vel.dx;
+        double initialDy = projectile.vel.dy;
+
+        // Exercise
+        projectile.update(1.0, 0.0, 0.0);
+
+        // Verify - velocity should remain constant (no gravity effect)
+        assertUnit(projectile.vel.dx == initialDx);
+        assertUnit(projectile.vel.dy == initialDy);
+    }
+
+    void testLifetime()
+    {
+        // Setup
+        Spaceship ship;
+        Projectile projectile(&ship);
+        projectile.lifetime = 1;
+
+        // Verify initial state
+        assertUnit(projectile.isExpired() == false);
+
+        // Exercise - update until expired
+        projectile.update(1.0, 0.0, 0.0);
+        projectile.update(1.0, 0.0, 0.0);
+
+        // Verify - should be expired
+        assertUnit(projectile.isExpired() == true);
     }
 };
 

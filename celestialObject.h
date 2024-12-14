@@ -18,6 +18,14 @@ class CelestialObject : public Object
 {
 public:
     friend class TestCelestialObject;
+    friend class TestHubble;
+    friend class TestDragon;
+    friend class TestGPS;
+    friend class TestShip;
+    friend class TestSputnik;
+    friend class TestStarlink;
+    friend class TestPart;
+
     CelestialObject(Position pos = Position(), Velocity vel = Velocity(), Angle angle = Angle()) : Object(pos, vel, angle)
     {
         this->radius = 0;

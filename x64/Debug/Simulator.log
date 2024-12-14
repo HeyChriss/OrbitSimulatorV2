@@ -1,8 +1,27 @@
-﻿  velocity.cpp
-C:\Users\USUARIO\Desktop\v2\velocity.h(48,56): warning C4244: '=': conversión de 'double' a 'float'; posible pérdida de datos
-C:\Users\USUARIO\Desktop\v2\velocity.h(48,70): warning C4244: '=': conversión de 'double' a 'float'; posible pérdida de datos
-C:\Users\USUARIO\Desktop\v2\velocity.h(49,41): warning C4244: '=': conversión de 'double' a 'float'; posible pérdida de datos
-C:\Users\USUARIO\Desktop\v2\velocity.h(50,41): warning C4244: '=': conversión de 'double' a 'float'; posible pérdida de datos
-C:\Users\USUARIO\Desktop\v2\velocity.h(51,49): warning C4244: '=': conversión de 'double' a 'float'; posible pérdida de datos
-C:\Users\USUARIO\Desktop\v2\velocity.h(52,49): warning C4244: '=': conversión de 'double' a 'float'; posible pérdida de datos
+﻿  GPS.cpp
+  Hubble.cpp
+  Satellite.cpp
+  Ship.cpp
+  Sputnik.cpp
+  Starlink.cpp
+  angle.cpp
+  celestialObject.cpp
+C:\Users\USUARIO\Desktop\v2\celestialObject.cpp(27,55): warning C4267: 'argumento': conversión de 'size_t' a 'int'; posible pérdida de datos
+  dragon.cpp
+  earth.cpp
+  fragment.cpp
+  main.cpp
+  object.cpp
+  part.cpp
+  physics.cpp
+  position.cpp
+  projectile.cpp
+  simulator.cpp
+  test.cpp
+  uiDraw.cpp
+  Generando código...
+  Compilando...
+  uiInteract.cpp
+  velocity.cpp
+  Generando código...
   Simulator.vcxproj -> C:\Users\USUARIO\Desktop\v2\x64\Debug\Simulator.exe

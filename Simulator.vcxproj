@@ -147,10 +147,6 @@
     <ClCompile Include="Sputnik.cpp" />
     <ClCompile Include="Starlink.cpp" />
     <ClCompile Include="test.cpp" />
-    <ClCompile Include="testAngle.cpp" />
-    <ClCompile Include="testhubble.cpp" />
-    <ClCompile Include="testPhysics.cpp" />
-    <ClCompile Include="TestShip.cpp" />
     <ClCompile Include="uiDraw.cpp" />
     <ClCompile Include="uiInteract.cpp" />
     <ClCompile Include="velocity.cpp" />

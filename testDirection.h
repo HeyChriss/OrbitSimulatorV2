@@ -13,27 +13,36 @@
 #include <cassert>
 #include "direction.h"
 #include "unitTest.h"
+#include "testVelocity.h"
 
-using namespace std;
-
-/*******************************
- * TEST Direction
- * A friend class for Direction which contains the unit tests
- ********************************/
 class TestDirection : public UnitTest
 {
 public:
     void run()
     {
         testDefaultConstructor();
-        testParameterizedConstructor();
-        testConvertToRadians();
-        testConvertToDegrees();
-        testSettersAndGetters();
-        testNormalization();
-        testEqualityOperators();
+        testNonDefaultConstructor();
+        testConvertToDegreesZero();
+        testConvertToDegreesQuarterCircle();
+        testConvertToDegreesHalfCircle();
+        testConvertToDegreesFullCircle();
+        testConvertToRadiansZero();
+        testConvertToRadiansQuarterCircle();
+        testConvertToRadiansHalfCircle();
+        testConvertToRadiansFullCircle();
+        testNormalizeZero();
+        testNormalizePositive();
+        testNormalizeNegative();
+        testNormalizeMultipleRevolutions();
+        testAssignmentOperator();
         testUnaryMinusOperator();
-        testIncrementDecrementOperators();
+        testEqualityOperator();
+        testInequalityOperator();
+        testPrefixIncrement();
+        testPostfixIncrement();
+        testPrefixDecrement();
+        testPostfixDecrement();
+        testConstants();
 
         report("Direction");
     }
@@ -41,78 +50,184 @@ public:
 private:
     void testDefaultConstructor()
     {
-        // Setup
+        // Setup & Exercise
         Direction d;
 
-        // Verify
-        assertUnit(d.getDegrees() == 0.0);
-        assertUnit(d.getRadians() == 0.0);
+        // Verify - direct member access
+        assertUnit(d.degrees == 0.0);
+        assertUnit(d.radians == 0.0);
     }
 
-    void testParameterizedConstructor()
+    void testNonDefaultConstructor()
     {
-        // Setup
+        // Setup & Exercise
         Direction d(180.0);
 
-        // Verify
-        float epsilon = 1e-6;
-        assertUnit(fabs(d.getDegrees() - 180.0) < epsilon);
-        assertUnit(fabs(d.getRadians() - Direction().pi) < epsilon);
+        // Verify - direct member access
+        assertUnit(d.degrees == 180.0);
+        assertUnit(fabs(d.radians - M_PI) < 0.001);
     }
 
-    void testConvertToRadians()
+    void testConvertToDegreesZero()
     {
         // Setup
         Direction d;
 
+        // Exercise
+        double result = d.convertToDegrees(0.0);
+
         // Verify
-        assertUnit(d.convertToRadians(180.0) == Direction().pi);
+        assertUnit(result == 0.0);
     }
 
-    void testConvertToDegrees()
+    void testConvertToDegreesQuarterCircle()
     {
         // Setup
         Direction d;
 
+        // Exercise
+        double result = d.convertToDegrees(M_PI / 2);
+
         // Verify
-        assertUnit(d.convertToDegrees(Direction().pi) == 180.0);
+        assertUnit(fabs(result - 90.0) < 0.001);
     }
 
-    void testSettersAndGetters()
+    void testConvertToDegreesHalfCircle()
     {
         // Setup
         Direction d;
-        d.setDegrees(90.0);
-        d.setRadians(Direction().pi / 2);
+
+        // Exercise
+        double result = d.convertToDegrees(M_PI);
 
         // Verify
-        float epsilon = 1e-6;
-        assertUnit(fabs(d.getDegrees() - 90.0) < epsilon);
-        assertUnit(fabs(d.getRadians() - (Direction().pi / 2)) < epsilon);
+        assertUnit(fabs(result - 180.0) < 0.001);
     }
 
-    void testNormalization()
+    void testConvertToDegreesFullCircle()
     {
         // Setup
-        Direction d(450.0); // 450 degrees -> 90 degrees after normalization
+        Direction d;
+
+        // Exercise
+        double result = d.convertToDegrees(2 * M_PI);
+
+        // Verify
+        assertUnit(fabs(result - 360.0) < 0.001);
+    }
+
+    void testConvertToRadiansZero()
+    {
+        // Setup
+        Direction d;
+
+        // Exercise
+        double result = d.convertToRadians(0.0);
+
+        // Verify
+        assertUnit(result == 0.0);
+    }
+
+    void testConvertToRadiansQuarterCircle()
+    {
+        // Setup
+        Direction d;
+
+        // Exercise
+        double result = d.convertToRadians(90.0);
+
+        // Verify
+        assertUnit(fabs(result - M_PI / 2) < 0.001);
+    }
+
+    void testConvertToRadiansHalfCircle()
+    {
+        // Setup
+        Direction d;
+
+        // Exercise
+        double result = d.convertToRadians(180.0);
+
+        // Verify
+        assertUnit(fabs(result - M_PI) < 0.001);
+    }
+
+    void testConvertToRadiansFullCircle()
+    {
+        // Setup
+        Direction d;
+
+        // Exercise
+        double result = d.convertToRadians(360.0);
+
+        // Verify
+        assertUnit(fabs(result - 2 * M_PI) < 0.001);
+    }
+
+    void testNormalizeZero()
+    {
+        // Setup
+        Direction d(0.0);
 
         // Exercise
         d.normalize();
 
-        // Verify
-        assertUnit(d.getDegrees() == 90.0);
+        // Verify - direct member access
+        assertUnit(d.degrees == 0.0);
+        assertUnit(d.radians == 0.0);
     }
 
-    void testEqualityOperators()
+    void testNormalizePositive()
+    {
+        // Setup
+        Direction d(720.0);  // Two full rotations
+
+        // Exercise
+        d.normalize();
+
+        // Verify - direct member access
+        assertUnit(d.degrees == 0.0);
+        assertUnit(fabs(d.radians) < 0.001);
+    }
+
+    void testNormalizeNegative()
+    {
+        // Setup
+        Direction d(-180.0);
+
+        // Exercise
+        d.normalize();
+
+        // Verify - direct member access
+        assertUnit(d.degrees == 180.0);
+        assertUnit(fabs(d.radians - M_PI) < 0.001);
+    }
+
+    void testNormalizeMultipleRevolutions()
+    {
+        // Setup
+        Direction d(900.0);  // 2.5 rotations
+
+        // Exercise
+        d.normalize();
+
+        // Verify - direct member access
+        assertUnit(fabs(d.degrees - 180.0) < 0.001);
+        assertUnit(fabs(d.radians - M_PI) < 0.001);
+    }
+
+    void testAssignmentOperator()
     {
         // Setup
         Direction d1(90.0);
-        Direction d2(450.0); // Equivalent to 90 degrees after normalization
-        d2.normalize();
+        Direction d2;
 
-        // Verify
-        assertUnit(d1 == d2);
-        assertUnit(!(d1 != d2));
+        // Exercise
+        d2 = d1;
+
+        // Verify - direct member access
+        assertUnit(d2.degrees == d1.degrees);
+        assertUnit(d2.radians == d1.radians);
     }
 
     void testUnaryMinusOperator()
@@ -121,27 +236,97 @@ private:
         Direction d(90.0);
 
         // Exercise
-        Direction negD = -d;
+        Direction result = -d;
 
-        // Verify
-        assertUnit(negD.getDegrees() == 270.0); // 360 - 90 = 270
+        // Verify - direct member access
+        assertUnit(fabs(result.degrees - 270.0) < 0.001);
+        assertUnit(fabs(result.radians - (3 * M_PI / 2)) < 0.001);
     }
 
-    void testIncrementDecrementOperators()
+    void testEqualityOperator()
+    {
+        // Setup
+        Direction d1(90.0);
+        Direction d2(90.0);
+        Direction d3(180.0);
+
+        // Exercise & Verify
+        assertUnit(d1 == d2);
+        assertUnit(!(d1 == d3));
+    }
+
+    void testInequalityOperator()
+    {
+        // Setup
+        Direction d1(90.0);
+        Direction d2(90.0);
+        Direction d3(180.0);
+
+        // Exercise & Verify
+        assertUnit(!(d1 != d2));
+        assertUnit(d1 != d3);
+    }
+
+    void testPrefixIncrement()
+    {
+        // Setup
+        Direction d(89.0);
+
+        // Exercise
+        ++d;
+
+        // Verify - direct member access
+        assertUnit(d.degrees == 90.0);
+    }
+
+    void testPostfixIncrement()
+    {
+        // Setup
+        Direction d(89.0);
+
+        // Exercise
+        Direction result = d++;
+
+        // Verify - direct member access
+        assertUnit(result.degrees == 89.0);
+        assertUnit(d.degrees == 90.0);
+    }
+
+    void testPrefixDecrement()
     {
         // Setup
         Direction d(90.0);
 
         // Exercise
-        ++d; // Prefix increment
-        d++; // Postfix increment
-        --d; // Prefix decrement
-        d--; // Postfix decrement
+        --d;
 
-        // Verify
-        assertUnit(d.getDegrees() == 90.0); // Should return to original value
+        // Verify - direct member access
+        assertUnit(d.degrees == 89.0);
     }
 
+    void testPostfixDecrement()
+    {
+        // Setup
+        Direction d(90.0);
+
+        // Exercise
+        Direction result = d--;
+
+        // Verify - direct member access
+        assertUnit(result.degrees == 90.0);
+        assertUnit(d.degrees == 89.0);
+    }
+
+    void testConstants()
+    {
+        // Setup
+        Direction d;
+
+        // Verify
+        assertUnit(fabs(d.pi - M_PI) < 0.001);
+        assertUnit(fabs(d.fullRevolutionRad - (2 * M_PI)) < 0.001);
+        assertUnit(d.fullRevolutionDeg == 360.0);
+    }
 };
 
 #endif /* testDirection_h */

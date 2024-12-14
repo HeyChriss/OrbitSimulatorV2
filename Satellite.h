@@ -14,6 +14,7 @@ class Satellite : public CelestialObject
 {
 public:
     friend class TestSatellite;
+    friend class TestHubble;
 
     Satellite(Position pos = Position(), Velocity vel = Velocity(), Angle angle = Angle()) : CelestialObject(pos, vel, angle)
     {

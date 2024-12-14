@@ -14,6 +14,8 @@ class Fragment : public CelestialObject
 {
 public:
     friend class TestFragment;
+    friend class TestProjectile;
+
     Fragment(Position pos = Position(), Velocity vel = Velocity(), Angle angle = Angle()) : CelestialObject(pos, vel, angle)
     {
         this->lifetime = random(50, 100);

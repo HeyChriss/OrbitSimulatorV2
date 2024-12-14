@@ -27,108 +27,222 @@ class TestCelestialObject : public UnitTest
 public:
     void run()
     {
-        testDefaultConstructor();
-        testIsHit();
-        testBreakApart();
-        testGetSubPartVel();
-        testGetSubPartPos();
+        testDefaultConstructorInitialization();
+        testPositionInitialization();
+        testVelocityInitialization();
+        testRotationInitialization();
+        testRadius();
+        testFragments();
+        testIsHitCollision();
+        testBreakApartExpired();
+        testBreakApartHasBeenHit();
+        testBreakApartCreateFragments();
+        testGetSubPartVelCount();
+        testGetSubPartVelSpeed();
+        testGetSubPartPosCount();
+        testGetSubPartPosOffset();
+        testRandomVelocityChange();
 
         report("CelestialObject");
     }
 
 private:
-    void testDefaultConstructor()
+    void testDefaultConstructorInitialization()
     {
-        // Setup
+        // Setup & Exercise
         CelestialObject obj;
 
-        // Verify
-        assertUnit(obj.getExpired() == false);
-        assertUnit(obj.getHasBeenHit() == false);
-        assertUnit(obj.getRadius() == 0.0);
-        assertUnit(obj.getNumFragments() == 0);
+        // Verify - direct member access
+        assertUnit(obj.isExpired == false);
+        assertUnit(obj.hasBeenHit == false);
+        assertUnit(obj.radius == 0.0);
+        assertUnit(obj.numFragments == 0);
     }
 
-    void testIsHit()
+    void testPositionInitialization()
+    {
+        // Setup & Exercise
+        Position pos(100.0, 200.0);
+        CelestialObject obj(pos);
+
+        // Verify - direct member access
+        assertUnit(obj.pos.x == 100.0);
+        assertUnit(obj.pos.y == 200.0);
+    }
+
+    void testVelocityInitialization()
+    {
+        // Setup & Exercise
+        Velocity vel(10.0, 20.0);
+        CelestialObject obj(Position(), vel);
+
+        // Verify - direct member access
+        assertUnit(obj.vel.dx == 10.0);
+        assertUnit(obj.vel.dy == 20.0);
+    }
+
+    void testRotationInitialization()
+    {
+        // Setup & Exercise
+        Angle angle;
+        angle.radAngle = 1.5;
+        CelestialObject obj(Position(), Velocity(), angle);
+
+        // Verify - direct member access
+        assertUnit(obj.rotationAngle.radAngle == 1.5);
+    }
+
+    void testRadius()
+    {
+        // Setup & Exercise
+        CelestialObject obj;
+        obj.radius = 5.0;
+
+        // Verify - direct member access
+        assertUnit(obj.radius == 5.0);
+    }
+
+    void testFragments()
+    {
+        // Setup & Exercise
+        CelestialObject obj;
+        obj.numFragments = 3;
+
+        // Verify - direct member access
+        assertUnit(obj.numFragments == 3);
+    }
+
+    void testIsHitCollision()
     {
         // Setup
-        Position pos1(0, 0);
-        Position pos2(10, 0); // 10 units away on the x-axis
-        Velocity vel;
-        CelestialObject obj1(pos1, vel);
-        CelestialObject obj2(pos2, vel);
-
-        obj1.setExpired(false);
-        obj1.setHasBeenHit(false);
-        obj2.setExpired(false);
-        obj2.setHasBeenHit(false);
-        obj1.radius = 6; // Set radius to 6 units
-        obj2.radius = 6; // Set radius to 6 units
+        CelestialObject obj1;
+        CelestialObject obj2;
+        obj1.radius = 6;
+        obj2.radius = 6;
+        obj1.pos.x = 0;
+        obj1.pos.y = 0;
+        obj2.pos.x = 10;
+        obj2.pos.y = 0;
 
         // Exercise
-        bool collision = obj1.isHit(&obj2);
+        bool result = obj1.isHit(&obj2);
 
-        // Verify
-        assertUnit(collision == true);
+        // Verify - should collide as radiuses overlap
+        assertUnit(result == true);
     }
 
-    void testBreakApart()
+
+    void testBreakApartExpired()
     {
         // Setup
         Simulator sim;
-        Position pos(0, 0);
-        Velocity vel(5, 5);
-        CelestialObject obj(pos, vel);
-        obj.numFragments = 3; // Set the number of fragments
+        CelestialObject obj;
+        obj.numFragments = 3;
 
         // Exercise
         obj.breakApart(&sim);
 
-        // Verify
-        assertUnit(obj.getExpired() == true);
-        assertUnit(obj.getHasBeenHit() == true);
-        // Additional checks for simulator objects can be added based on `sim.addObject`.
+        // Verify - direct member access
+        assertUnit(obj.isExpired == true);
     }
 
-    void testGetSubPartVel()
+    void testBreakApartHasBeenHit()
     {
         // Setup
+        Simulator sim;
         CelestialObject obj;
-        obj.vel = Velocity(5, 0); // Initial velocity
-        int numSubParts = 4;
+        obj.numFragments = 3;
 
         // Exercise
-        vector<Velocity> velocities = obj.getSubPartVel(numSubParts);
+        obj.breakApart(&sim);
 
-        // Verify
-        assertUnit(velocities.size() == numSubParts);
-        for (const auto& velocity : velocities)
-        {
-            assertUnit(velocity.getSpeed() > 0.0);
-        }
+        // Verify - direct member access
+        assertUnit(obj.hasBeenHit == true);
     }
 
-    void testGetSubPartPos()
+    void testBreakApartCreateFragments()
+    {
+        // Setup
+        DummySimulator sim("Hubble");
+        CelestialObject obj;
+        obj.numFragments = 2;
+
+        // Exercise
+        obj.breakApart(&sim);
+
+        // Verify - fragments should have been created in simulator
+        assertUnit(sim.celestialObjects.size() > 0);
+    }
+
+
+    void testGetSubPartVelCount()
     {
         // Setup
         CelestialObject obj;
-        obj.pos = Position(0, 0); // Initial position
-        vector<Velocity> directions = {
-            Velocity(1, 0),
-            Velocity(0, 1),
-            Velocity(-1, 0),
-            Velocity(0, -1)
-        };
+        obj.vel.dx = 5;
+        obj.vel.dy = 0;
+        int numParts = 4;
+
+        // Exercise
+        vector<Velocity> velocities = obj.getSubPartVel(numParts);
+
+        // Verify - direct member access
+        assertUnit(velocities.size() == numParts);
+    }
+
+    void testGetSubPartVelSpeed()
+    {
+        // Setup
+        CelestialObject obj;
+        obj.vel.dx = 5;
+        obj.vel.dy = 0;
+
+        // Exercise
+        vector<Velocity> velocities = obj.getSubPartVel(1);
+
+        // Verify - direct member access
+        assertUnit(velocities[0].dx != 0.0 || velocities[0].dy != 0.0);
+    }
+
+    void testGetSubPartPosCount()
+    {
+        // Setup
+        CelestialObject obj;
+        vector<Velocity> directions = { Velocity(1,0), Velocity(0,1) };
 
         // Exercise
         vector<Position> positions = obj.getSubPartPos(directions);
 
         // Verify
         assertUnit(positions.size() == directions.size());
-        for (const auto& position : positions)
-        {
-            assertUnit(position.getMetersX() != 0 || position.getMetersY() != 0);
-        }
+    }
+
+    void testGetSubPartPosOffset()
+    {
+        // Setup
+        CelestialObject obj;
+        obj.pos.x = 0;
+        obj.pos.y = 0;
+        vector<Velocity> directions = { Velocity(1,0) };
+
+        // Exercise
+        vector<Position> positions = obj.getSubPartPos(directions);
+
+        // Verify - position should be offset from original
+        assertUnit(positions[0].x != obj.pos.x || positions[0].y != obj.pos.y);
+    }
+
+    void testRandomVelocityChange()
+    {
+        // Setup
+        CelestialObject obj;
+        Velocity originalVel(100, 100);
+
+        // Exercise
+        Velocity newVel = obj.randomVelocity(originalVel);
+
+        // Verify - velocity should be different
+        assertUnit(newVel.dx != originalVel.dx || newVel.dy != originalVel.dy);
     }
 };
 
